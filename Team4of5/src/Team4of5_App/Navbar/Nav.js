@@ -36,9 +36,9 @@ class  NavbarHeaderC extends React.Component {
         newuser.push({
           role: userdata[k].role
         });
-        alert(this.state.user)
       }
       this.setState({user: newuser});
+      alert(this.state.user)
     }
     errData = (err) => {
   console.log(err);
@@ -49,7 +49,8 @@ render(){
       <Navbar inverse>
          <Navbar.Header>
            <Navbar.Brand>
-                 <a>Team 4 of 5</a>              
+                 <a>Team 4 of 5</a> 
+                  {this.state.user}
             </Navbar.Brand>
          </Navbar.Header>
          <Navbar.Collapse>
