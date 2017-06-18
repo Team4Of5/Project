@@ -12,6 +12,7 @@ import {
     NavLink
 } from 'react-router-dom';
 
+
 class  NavbarHeaderC extends React.Component {
      constructor(props) {
      super(props);
@@ -21,9 +22,21 @@ class  NavbarHeaderC extends React.Component {
 //   //this is connect to the firebase
     this.userRef = firebase.app().database().ref().child('users');
     }
+    //get the user info
+  
 //   //After the connect, what the state will do--gotdata
-  componentDidMount() {
-    this.userRef.on('value', this.gotData, this.errData);
+  // componentDidMount() {
+   // this.userRef.on('value', this.gotData, this.errData);
+   // }
+
+    getUser (){
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+            var user_uid = user.uid;
+            var thisUserRef = this.userRef.child(user_uid);
+            this.thisUserRef.on('value', this.gotData, this.errData);
+        }
+      });
     }
 //   //get the data from the firebase and push them out
   gotData = (data) => {
@@ -50,7 +63,6 @@ render(){
          <Navbar.Header>
            <Navbar.Brand>
                  <a>Team 4 of 5</a> 
-                  {this.state.user}
             </Navbar.Brand>
          </Navbar.Header>
          <Navbar.Collapse>
