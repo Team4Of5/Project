@@ -1,6 +1,7 @@
 import React from 'react';
-
 import { Navbar, NavItem, Nav, Jumbotron, Button, Input} from 'react-bootstrap';
+import * as firebase from 'firebase';
+import * as Config from '../../Team4of5_Service/Config.js';
 
 import {
     BrowserRouter as Router,
@@ -11,13 +12,57 @@ import {
     NavLink
 } from 'react-router-dom';
 
+
 class  NavbarHeaderC extends React.Component {
+     constructor(props) {
+     super(props);
+     this.state = {
+       user: []
+     };
+//   //this is connect to the firebase
+    this.userRef = firebase.app().database().ref().child('users');
+    }
+    //get the user info
+  
+//   //After the connect, what the state will do--gotdata
+  // componentDidMount() {
+   // this.userRef.on('value', this.gotData, this.errData);
+   // }
+
+    getUser (){
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+            var user_uid = user.uid;
+            var thisUserRef = this.userRef.child(user_uid);
+            this.thisUserRef.on('value', this.gotData, this.errData);
+        }
+      });
+    }
+//   //get the data from the firebase and push them out
+  gotData = (data) => {
+      let newuser = []
+      const userdata = data.val();
+      const keys = Object.keys(userdata);
+
+      for (let i = 0; i < keys.length; i++) {
+        const k = keys[i];
+        newuser.push({
+          role: userdata[k].role
+        });
+      }
+      this.setState({user: newuser});
+      alert(this.state.user)
+    }
+    errData = (err) => {
+  console.log(err);
+  }
+
 render(){
   return (
       <Navbar inverse>
          <Navbar.Header>
            <Navbar.Brand>
-                 <a>Team 4 Of 5</a>
+                 <a>Team 4 of 5</a> 
             </Navbar.Brand>
          </Navbar.Header>
          <Navbar.Collapse>

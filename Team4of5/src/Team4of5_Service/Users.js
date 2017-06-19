@@ -9,6 +9,22 @@ var ref = firebase.app().database().ref();
 var usersRef = ref.child('users');
 
 
+
+export const find_role = function (){
+        firebase.auth().onAuthStateChanged(function(user) {
+          if (user) {
+            var user_uid = user.uid;
+            var thisUserRef = usersRef.child(user_uid);
+            // alert("user " + user.uid + " logged in");
+            thisUserRef.on("value", function(snapshot) {
+              var userInfo = snapshot.val();
+              var x = userInfo.display_name + ", "  + userInfo.role;
+              return x;
+            });
+            }
+        });
+}
+
 export const create_user = function (user_email, user_pass) {
     return firebase.auth().createUserWithEmailAndPassword(user_email, user_pass);
 }
@@ -41,8 +57,6 @@ export const resetPwdWhenLoggedOn = function(){
         if (user) {
         // alert("user " + user.email + " wants to reset their passwords");
          var user_email  = user.email;
-         var user_uid  = user.uid;
-		    var thisUserRef = usersRef.child(user_uid);
          firebase.auth().sendPasswordResetEmail(user_email);
         } // end if
        }) // end function
