@@ -4,7 +4,10 @@ import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import BugTrackTableSearch from './BugTrackingToolBar.js';
 import { Navbar, Jumbotron, Button, Input, Nav } from 'react-bootstrap';
 
-import database from './database'
+//import database from './database'
+import * as firebase from 'firebase';
+import * as Config from '../../Team4of5_Service/Config.js';
+import * as Issues from '../../Team4of5_Service/Issues.js';
 
 const bugData = []
 const bugDataTypes = [ {
@@ -71,7 +74,7 @@ class BugTrackingTableBody extends React.Component{
   };
 
     //connect to database
-    this.bugRef = database.ref().child('bugs');
+    this.bugRef = firebase.database().ref().child('bugs');
 }
 //After the connect, what the state will do--gotdata
 componentDidMount() {
