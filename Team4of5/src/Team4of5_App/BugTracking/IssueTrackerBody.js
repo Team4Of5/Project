@@ -2,8 +2,11 @@ import React, {Component} from 'react';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 
 import { Navbar, Jumbotron, Button, Input, Nav } from 'react-bootstrap';
-import database from './database'
-import * as Bugs from '../../Team4of5_Service/Bugs.js'
+
+//Connect Firebase
+import * as firebase from 'firebase';
+import * as Config from '../../Team4of5_Service/Config.js';
+import * as Issues from '../../Team4of5_Service/Issues.js';
 
 
 const issueData = []
@@ -48,17 +51,17 @@ class IssueTrackerBody extends React.Component{
 
   this.state = {
     issues:[],
-    bug_id: ''
+
   };
 
-    //connect to database
-    this.issueRef = database.ref().child('issues');
+
+    this.issueRef = firebase.database().ref().child('issues');
     //Click the save button; then the data will save to firebase
     this.handleSaveBtnClick = this.handleSaveBtnClick.bind(this);
 }
 //After the connect, what the state will do--gotdata
 componentDidMount() {
-  this.issueRef.on('value', this.gotData, this.errData, this.saveData);
+  this.issueRef.on('value', this.gotData, this.errData);
 }
 
 //get the data from the firebase and push them out
@@ -70,7 +73,7 @@ componentDidMount() {
       for (let i = 0; i < keys.length; i++) {
         const k = keys[i];
         newIssue.push({
-          id: issuedata[k].id, status: issuedata[k].status,
+          id: issuedata[k].id, status: issuedata[k].issue_status,
           issueDate: issuedata[k].issueDate,
           owner: issuedata[k].owner, expComDate: issuedata[k].expComDate,
           details: issuedata[k].details,
@@ -80,6 +83,7 @@ componentDidMount() {
       }
       this.setState({issues: newIssue});
     }
+
         errData = (err) => {
     console.log(err);
     }
@@ -115,17 +119,29 @@ handleModalClose(onClose) {
     onClose();
   }
 //I try to connect database and write It back
-  handleSaveBtnClick(){
-    this.state.bug_id = 99;
-    Bugs.addNewBug(this.state.bug_id, 'a','b','c','d','e','f','g');
-};
+  handleSaveBtnClick(onSave){
+
+
+      if (this.state.issue_id || this.state.completionDate||this.state.details||this.state.expComDate||this.state.issueDate||this.state.owner||this.state.project||this.state.issue_status) {
+         Issues.addNewIssue(this.state.issue_id,
+              this.state.completionDate,this.state.details,
+              this.state.expComDate,this.state.issueDate,
+              this.state.owner,this.state.project,
+              this.state.issue_status).then((Issue)=>{
+                  console.log(Issue);
+              })
+
+      };
+     // call the onsave issue
+     onSave(Issues);
+    }
 
 
   createCustomModalFooter = (onClose, onSave) => {
     return (
         <div className='modal-footer' >
           <button className='btn btn-xs btn-info' onClick={ onClose }>Close</button>
-          <button className='btn btn-xs btn-danger' onClick={this.handleSaveBtnClick}>Report</button>
+          <button className='btn btn-xs btn-success' onClick={onSave}>Report</button>
         </div>
     );
 
