@@ -50,19 +50,15 @@ class IssueTrackerBody extends React.Component{
   super(props);
 
   this.state = {
-    issues:[],
-    issue_id: '',
-    issue_date: Date.now(),
-    status: ''
-
+    issues:[]
   };
 
 
     this.issueRef = firebase.database().ref().child('issues');
     //Click the save button; then the data will save to firebase
-    this.handleSaveBtnClick = this.handleSaveBtnClick.bind(this);
-    this.afterInsertRow = this.afterInsertRow.bind(this);
-    this.handleModalClose = this.handleModalClose.bind(this);
+    // this.handleSaveBtnClick = this.handleSaveBtnClick.bind(this);
+    // this.afterInsertRow = this.afterInsertRow.bind(this);
+    // this.handleModalClose = this.handleModalClose.bind(this);
 }
 //After the connect, what the state will do--gotdata
 componentDidMount() {
@@ -90,23 +86,7 @@ componentDidMount() {
       this.setState({issues: newIssue});
     }
 
-//     //try to add Data into
-// addData =(data)=>{
-//     let startId = data.length;
-//     for (let i = 0; i < data; i++){
-//         const id = startId + i;
-//         Issues.addNewIssue(this.state.Issues[i].issue_id,
-//           this.state.Issues[i].issue_status,
-//           this.state.Issues[i].owner,
-//           this.state.Issues[i].issueDate,
-//           this.state.Issues[i].expComDate,
-//           this.state.Issues[i].details,
-//           this.state.Issues[i].completionDate,
-//           this.state.Issues[i].project);
-//
-//     }
-//     this.setState({issues: Issues})
-// }
+
 
 errData = (err) => {
     console.log(err);
@@ -144,28 +124,30 @@ handleModalClose(onClose) {
   }
 //I try to connect database and write It back
 
-afterInsertRow() {
-   //var x = this.state.issues.length;
-   Issues.addNewIssue();
-   return Issues;
- }
- handleSaveBtnClick = (columns, onSave)=>{
-    const row = {};
-    columns.forEach((columns, i)=>{
-        if(this.refs[columns.filed] != undefined &&this.refs[columns.field].value!== undefined){
-            row[columns.field] = this.refs[columns.field].value;
-        }
-    },this);
-    this.setState({issues: Issues});
- }
-//   onAfterInsertRow=(row)=> {
-//   let newRowStr = '';
+// afterInsertRow() {
+//   var x = this.state.issues.length;
+//    Issues.addNewIssue(this.state.issues[x].issue_id,
+//              this.state.issues[x].issue_status,
+//              this.state.issues[x].owner,
+//              this.state.issues[x].issueDate,
+//              this.state.issues[x].expComDate,
+//              this.state.issues[x].details,
+//              this.state.issues[x].completionDate,
+//              this.state.issues[x].project);
 //
-//   for (const prop in row) {
-//     newRowStr += prop + ': ' + row[prop] + ' \n';
-//   }
-//   alert('The new row is:\n ' + newRowStr);
-// }
+//
+//    return Issues;
+//  }
+//  handleSaveBtnClick = (columns, onSave)=>{
+//     const row = {};
+//     columns.forEach((columns, i)=>{
+//         if(this.refs[columns.filed] != undefined &&this.refs[columns.field].value!== undefined){
+//             row[columns.field] = this.refs[columns.field].value;
+//         }
+//     },this);
+//     this.setState({issues: Issues});
+//  }
+
 
   createCustomModalFooter = (onClose, onSave) => {
     return (
@@ -180,22 +162,22 @@ afterInsertRow() {
 
   render(){
 
-   const options = {
-         insertModalHeader: this.createCustomModalHeader,
-         insertModalFooter: this.createCustomModalFooter,
-         afterInsertRow: this.afterInsertRow.bind(this),
-       };
+   // const options = {
+   //       insertModalHeader: this.createCustomModalHeader,
+   //       insertModalFooter: this.createCustomModalFooter,
+   //       onAddRow: this.props.onAddRow
+   //     };
 
 
 return (
       <BootstrapTable
         ref='table'
+        remote={ true }
         data={ this.state.issues }
         cellEdit={ cellEditProp }
         exportCSV={ true }
-        options={ options }
         pagination={true}
-        insertRow={true}
+        insertRow={false}
         search={true}>
 
         <TableHeaderColumn dataField='id' isKey={true} width='50'>ID</TableHeaderColumn>
