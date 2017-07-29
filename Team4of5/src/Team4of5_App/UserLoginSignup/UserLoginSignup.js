@@ -25,6 +25,8 @@ import {
     InputGroup,
     Glyphicon
 } from 'react-bootstrap';
+//import FormErrors
+import { FormErrors } from './FormError.js';
 
 class UserLoginSignup extends React.Component {
 
@@ -32,22 +34,69 @@ class UserLoginSignup extends React.Component {
     super(props);
 
     this.state = {
-      email: '',
-      password: '',
-      formBtnTxt: 'Login',
-      redirectToMenu: false
+        email : '',
+        password : '',
+        formBtnTxt : 'Login',
+        redirectToMenu : false,
+        formErrors : {
+            email: '',
+            password: ''
+        },
+        emailValid : false,
+        passwordValid : false,
+        formValid : false
+
     };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.switchLoginSignup = this.switchLoginSignup.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
   }
 
+  // handleChange(name, event) {
+  //   let items = this.state;
+  //   items[name] = event.target.value;
+  //   this.setState(items);
+  // }
 
-  handleChange(name, event) {
-    let items = this.state;
-    items[name] = event.target.value;
-    this.setState(items);
+  //credit to https://github.com/learnetto/react-form-validation-demo/blob/master/src/Form.js
+  handleChange = (e) => {
+    const name = e.target.name;
+    const value = e.target.value;
+    this.setState({[name]: value},
+                  () => { this.validateField(name, value) });
   }
+
+  validateField(fieldName, value) {
+   let fieldValidationErrors = this.state.formErrors;
+   let emailValid = this.state.emailValid;
+   let passwordValid = this.state.passwordValid;
+
+   switch(fieldName) {
+     case 'email':
+       emailValid = value.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i);
+       fieldValidationErrors.email = emailValid ? '' : ' is invalid';
+       break;
+     case 'password':
+       passwordValid = value.length >= 6;
+       fieldValidationErrors.password = passwordValid ? '': ' is too short';
+       break;
+     default:
+       break;
+   }
+   this.setState({formErrors: fieldValidationErrors,
+                   emailValid: emailValid,
+                   passwordValid: passwordValid
+                 }, this.validateForm);
+ }
+
+ validateForm() {
+   this.setState({formValid: this.state.emailValid && this.state.passwordValid});
+ }
+
+ errorClass(error) {
+   return(error.length === 0 ? '' : 'has-error');
+ }
+
 
    handlePasswordChange(event){
     if (this.state.email != ''){
@@ -126,7 +175,8 @@ class UserLoginSignup extends React.Component {
           id="switchBtn"
           onClick={this.switchLoginSignup}>Login &nbsp;&nbsp;|&nbsp;&nbsp; Signup</button>
 
-            <FormGroup controlId="formHorizontalEmail">
+            <FormGroup controlId="formHorizontalEmail"
+                className={`form-group ${this.errorClass(this.state.formErrors.email)}`}>
      <Col componentClass={ControlLabel} sm={2}>
        Email
      </Col>
@@ -135,12 +185,14 @@ class UserLoginSignup extends React.Component {
          <InputGroup.Addon>
          <Glyphicon glyph="user" />
          </InputGroup.Addon>
-       <FormControl type="text" placeholder="Email" value={this.state.email} onChange={this.handleChange.bind(this, 'email')}/>
+       <FormControl type="text" placeholder="Email" name="email"
+           required value={this.state.email} onChange={this.handleChange}/>
+
 </InputGroup>
      </Col>
    </FormGroup>
 
-   <FormGroup controlId="formHorizontalPassword">
+   <FormGroup controlId="formHorizontalPassword" className={`form-group ${this.errorClass(this.state.formErrors.password)}`}>
      <Col componentClass={ControlLabel} sm={2}>
        Password
        <small> at least 6 digits</small>
@@ -150,7 +202,9 @@ class UserLoginSignup extends React.Component {
          <InputGroup.Addon>
          <Glyphicon glyph="lock" />
          </InputGroup.Addon>
-       <FormControl type="password" placeholder="Password" value={this.state.first_name} onChange={this.handleChange.bind(this, 'password')}/>
+       <FormControl type="password" placeholder="Password" name="password"
+           value={this.state.first_name} onChange={this.handleChange}/>
+
 </InputGroup>
      </Col>
    </FormGroup>
@@ -159,10 +213,12 @@ class UserLoginSignup extends React.Component {
              <a onClick={this.handlePasswordChange} href="javascript:void(0);">Forgot Password?</a>
 
       </FormGroup>
+      <FormErrors formErrors={this.state.formErrors} />
       <FormGroup>
 
                 <input type="submit"
                  id = "submitBtn"
+                 disabled={!this.state.formValid}
                   value={this.state.formBtnTxt}/>
 
           </FormGroup>
