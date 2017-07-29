@@ -114,7 +114,7 @@ class CreateProject extends React.Component {
         return (
             <div className="panel panel-info" id="title">
                 <div className="panel-heading clearfix">
-                <h1  className="panel-title">Create A New Project</h1>
+                <h1  className="panel-title">Create a New Project</h1>
             </div>
             <div className="panel-body">
 
