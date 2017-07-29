@@ -13,12 +13,32 @@
     width: 15px
 }
 .menuBtn{
-    background:  #3498db;
-    width: 150px;
-    height: 40px;
-    color:  #ffffff;
-    text-decoration: none;
-    text-align: center;
-    -webkit-border-radius: 1;
--moz-border-radius: 1;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;    
+  background-color: transparent;
+  border: 2px solid #3498db;
+  border-radius: 0.6em;
+  cursor: pointer;
+  min-width: 150px;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 1em 2em;
+  text-decoration: none;
+  text-align: center;
+  background: #3498db;
+  font-weight: 900;
+    color: #fff;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  -webkit-transition: color 150ms ease-in-out;
+  transition: color 150ms ease-in-out;
 }
+
+.menuBtn:hover{
+  color: #fff;
+  background: #70b6e5;
+  border-color: #70b6e5;
+ }
