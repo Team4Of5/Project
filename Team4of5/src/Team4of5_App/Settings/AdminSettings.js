@@ -35,6 +35,8 @@ class AdminSettings extends React.Component {
             // company:'',
             email: '',
             value: [],
+            role: '',
+            newRole: '',
             curUserCompany: '',
             redirectToMenu: false,
             //userInfo: [],
@@ -74,17 +76,24 @@ class AdminSettings extends React.Component {
     }
     handleSendEmail(event) {
         let self = this;
-        event.preventDefault();
+        
         // check if user already exists, if so and company is blank, set to this user's company
-        Users.getAllUsersData().then(function (data) {
+        if(this.state.email){
+            Users.getAllUsersData()
 
-            self.gotData(data);
-        }, function (err) {
-            //Error occur
-            console.log("Promise Error");
-            console.log(err);
-        })
+            .then(function (data) {
 
+                self.gotData(data);
+            }, function (err) {
+                //Error occur
+                console.log("Promise Error");
+                console.log(err);
+            })
+ 
+        }
+
+
+        event.preventDefault();
     }
 
 
@@ -114,20 +123,28 @@ class AdminSettings extends React.Component {
                 length: 10,
                 numbers: true
             });
-            Users.create_user(this.state.email, password).then((Users) => {
+
+            Users.create_user(this.state.email, password)
+            .then((User) => {
                 Users.resetPwd(this.state.email)
+                Users.updateCompany(this.state.email, this.state.curUserCompany).then((User) => {
+                Users.updateRole(this.state.email,this.state.curUserCompany, this.state.role)
+                })
             })
+
+
             alert("User has been created")
 
 
         }
+
     }
     handleSubmit(event) {
 
         event.preventDefault();
         if (this.state.value.email) {
 
-            Users.updateToAdmin(this.state.value.email, this.state.company)
+            Users.updateRole(this.state.value.email, this.state.curUserCompany, this.state.newRole)
                 .then((Users) => {
                     //handle redirect
                     this.setState({ redirectToMenu: true });
@@ -138,7 +155,6 @@ class AdminSettings extends React.Component {
             alert("Please select a user ");
         }
 
-        this.state.value = [];
     }
     getUsers(input) {
 
@@ -209,8 +225,15 @@ class AdminSettings extends React.Component {
                                 <FormGroup controlId="formControlsText">
                                     <ControlLabel>Invitee Email</ControlLabel>
                                     <FormControl type="text" value={this.state.email} onChange={this.handleChange.bind(this, 'email')} />
+                                    <ControlLabel>Role</ControlLabel>
+                                    <FormControl componentClass="select" value={this.state.role} onChange={this.handleChange.bind(this, 'role')}>
+
+                                        <option value=""></option>
+                                        <option value="Administrator">Administrator</option>
+                                        <option value="Customer">Customer</option>
+                                        <option value="Project Contributor">Project Contributor</option>
+                                    </FormControl>
                                 </FormGroup>
-                                {/* <FormControl componentClass="text" value={this.state.email} onChange={this.handleChange.bind(this, 'email')}/> */}
 
                             </div>
                             <button type="submit" id="setingBtn" className="btn btn-primary"> Invite User </button>
@@ -222,7 +245,7 @@ class AdminSettings extends React.Component {
                             <div className="panel panel-info" id="restRole">
                                 <div className="panel-heading clearfix">
                                     <h1 className="panel-title pull-left">
-                                        Reset Role</h1>
+                                        Update Existing User's Role</h1>
 
                                     <div className="pull-right">
                                         <p>Please enter the user who want to make an admin</p>
@@ -243,12 +266,20 @@ class AdminSettings extends React.Component {
                                             ignoreCase={false}
                                             loadOptions={this.getUsers}
                                             backspaceRemoves={true} />
+                                    <ControlLabel>Role</ControlLabel>
+                                    <FormControl componentClass="select" value={this.state.newRole} onChange={this.handleChange.bind(this, 'newRole')}>
+
+                                        <option value=""></option>
+                                        <option value="Administrator">Administrator</option>
+                                        <option value="Customer">Customer</option>
+                                        <option value="Project Contributor">Project Contributor</option>
+                                    </FormControl>
                                     </FormGroup>
                                 </div>
 
 
                             </div>
-                            <button type="submit" id="setingBtn" className="btn btn-primary"> Update to Admin </button>
+                            <button type="submit" id="setingBtn" className="btn btn-primary"> Update Role </button>
                             <Link to='/menu' className='btn btn-danger'>Cancel</Link>
                         </form>
                     </div>

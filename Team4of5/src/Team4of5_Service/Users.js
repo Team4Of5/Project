@@ -45,7 +45,9 @@ export const saveUserinfo = function () {
     });
 }
 
-export const updateToAdmin = function (email, company) {
+export const updateRole = function (email, company, new_role) {
+    var user = firebase.auth().currentUser;
+    var user_email = user.email;
     return usersRef.once("value", function(snap) {
       const keys = Object.keys(snap.val());
       for (let i = 0; i < keys.length; i++) {
@@ -54,16 +56,18 @@ export const updateToAdmin = function (email, company) {
         var thisUserRef =  usersRef.child(k)
         thisUserRef.once("value", function(snap2){
         if (snap2.val().email == email){
-
-            if (snap2.val().company != company){
-                alert("You cannot edit someone outside of your company.")
+            if(user_email == email){
+                alert("Please use settings to update your own role")
+            }
+            else if (snap2.val().company != company){
+                alert("You cannot edit someone outside of your company")
             } else if (snap2.val().role=="Sysadmin"){
                 alert("You cannot edit Sysadmin privileges")
             }
             else {
 
             usersRef.child(k).update({
-                role: "Admin"
+                role: new_role
             });
         }
 
