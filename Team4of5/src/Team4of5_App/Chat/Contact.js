@@ -10,6 +10,9 @@ import * as actions from '../App_Redux/ActionCreator'
 import { bindActionCreators } from 'redux';
 import createStore from '../App_Redux/CreateStores'
 
+import FaCircle from 'react-icons/lib/fa/circle'
+import FaCircleThin from 'react-icons/lib/fa/circle-thin'
+
 import InfiniteScroll from 'react-infinite-scroll-component';
 import FaChild from 'react-icons/lib/fa/child';
 import * as ChatService from '../../Team4of5_Service/Chat.js';
@@ -97,7 +100,9 @@ class Contact extends React.Component {
 
                 let content = null;
                 if (element.type == 'Individual') {
-                    content = snapshot.val() == true ? <h5>(online)</h5> : <h5>(offline)</h5>
+                    content = snapshot.val() == true ? <FaCircle size={20} style={{ marginBottom: -10 }}/> 
+                        : <FaCircleThin size={20} style={{ marginBottom: -10 }}/>
+                    //<h5>(online)</h5> : <h5>(offline)</h5>
                 } else {
                     content = <FaChild size={30} />
                 }
@@ -118,11 +123,11 @@ class Contact extends React.Component {
 
                     <div className="panel panel-body" key={index} style={{ height: 50, marginBottom: 5, marginLeft:5, background: '#00ffffff', ...style }}>
                         <Row onClick={self.switchToChat.bind(self, index, element)} style={{ marginLeft: 0 }}>
-                            <Media.Left>
+                            <Media.Left >
                                 {content}
                             </Media.Left>
                             <Media.Body>
-                                <h5>{element.name}</h5>
+                                <h5> {element.name}</h5>
                             </Media.Body>
                         </Row>
                     </div>
