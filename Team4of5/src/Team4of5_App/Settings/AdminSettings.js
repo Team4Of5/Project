@@ -127,10 +127,16 @@ class AdminSettings extends React.Component {
             Users.create_user(this.state.email, password)
             .then((User) => {
                 Users.resetPwd(this.state.email)
-                Users.updateCompany(this.state.email, this.state.curUserCompany).then((User) => {
-                Users.updateRole(this.state.email,this.state.curUserCompany, this.state.role)
+                Users.updateCompany(this.state.email, this.state.curUserCompany)
+            .then((User) => {
+                    Users.updateRole(this.state.email,this.state.curUserCompany, this.state.role)
+            .then((User) => {
+                        this.setState({role:''});
+                        this.setState({email:''});
+
+                    })
                 })
-            })
+              })
 
 
             alert("User has been created")
@@ -147,10 +153,15 @@ class AdminSettings extends React.Component {
             Users.updateRole(this.state.value.email, this.state.curUserCompany, this.state.newRole)
                 .then((Users) => {
                     //handle redirect
+                    alert("User " + this.state.value.email + " has been changed to role " + this.state.newRole)
                     this.setState({ redirectToMenu: true });
+                     })
+                    .then((Users) => {
+                        this.setState({newRole:''});
+                        this.setState({value:''});
 
+                    })
 
-                })
         } else {
             alert("Please select a user ");
         }

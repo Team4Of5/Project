@@ -132,7 +132,7 @@ class IssueUpdate extends React.Component {
                         </Form>
                     </Modal.Body>
                      <Modal.Footer>
-                            <Button bsStyle="success" onClick={() => this.setState({show: false})}>Close</Button>
+                            <Button bsStyle="success" onClick={() => {this.setState({show: false}); this.state.severity = ''; this.state.issue_id = ''; this.state.priority = ''; this.state.status = '';  this.state.completionDate = ''; }}>Close</Button>
                      </Modal.Footer>
                 </Modal>
             </div>

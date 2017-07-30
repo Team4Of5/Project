@@ -35,10 +35,14 @@ export const saveUserinfo = function () {
             });
             thisUserRef.on("value", function (snapshot) {
                 var role = snapshot.val().role;
+                var company = snapshot.val().company
                 if (role == null) {
                             thisUserRef.update({
                                 role: 'Customer'
                 });
+
+
+                            
                 }
             });
         }
@@ -56,10 +60,7 @@ export const updateRole = function (email, company, new_role) {
         var thisUserRef =  usersRef.child(k)
         thisUserRef.once("value", function(snap2){
         if (snap2.val().email == email){
-            if(user_email == email){
-                alert("Please use settings to update your own role")
-            }
-            else if (snap2.val().company != company){
+            if (snap2.val().company != company){
                 alert("You cannot edit someone outside of your company")
             } else if (snap2.val().role=="Sysadmin"){
                 alert("You cannot edit Sysadmin privileges")
