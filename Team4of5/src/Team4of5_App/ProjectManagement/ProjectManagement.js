@@ -4,7 +4,7 @@ import ProjectManagementTable from './ProjectManagementTable.js';
 import './ProjectManagementTables.css';
 import * as Users from '../../Team4of5_Service/Users.js';
 //import { Board } from 'react-trello'
-import { Board } from './trello-board/index.js';
+import { Board } from './react-trello/src/index.js';
 import ReactModal from 'react-modal';
 import { forms } from 'pure-css';
 import * as ChatProj from '../../Team4of5_Service/ChatProject.js';
@@ -34,10 +34,7 @@ import * as firebase from 'firebase';
 import * as Config from '../../Team4of5_Service/Config.js';
 import * as Issues from '../../Team4of5_Service/Issues.js';
 
-const options = {
-    "USA": ["New York", "San Francisco"],
-    "Germany": ["Berlin", "Munich"]
-}
+var bogusdata = require("./data.json");
 
 var mydata = {
     lanes: [
@@ -93,14 +90,15 @@ let setEventBus = (handle) => {
 }
 
 const addCard = (laneID, id, title, description, project) => {
-    //console.log("adding: " + laneID + id + title + description)
+    //console.log("adding: " + laneID + id + title + description + project)
     ChatProj.addNewCard(laneID, id, title, description, project);
     eventBus.publish({ type: 'ADD_CARD', laneId: laneID, card: { id: id, title: "", label: title, description: description } });
 }
 
-const renderCard = (laneID, id, title, description) => {
+const renderCard = (laneID, id, title, description, data) => {
     eventBus.publish({ type: 'REMOVE_CARD', laneId: laneID, cardId: id });
     eventBus.publish({ type: 'ADD_CARD', laneId: laneID, card: { id: id, title: "", label: title, description: description } });
+    //eventBus.publish({ type: 'REFRESH_BOARD', data: data });
 }
 
 const deleteCard = (laneID, id, title, description, project) => {
@@ -122,14 +120,6 @@ const handleDragStart = (cardId, laneId) => {
     console.log('drag started')
     console.log(`cardId: ${cardId}`)
     console.log(`laneId: ${laneId}`)
-}
-
-
-
-const shouldReceiveNewData = (nextData) => {
-    //console.log('data has changed')
-    //console.log(nextData)
-    //console.log(mydata)
 }
 
 
@@ -184,8 +174,8 @@ class GetCardInfo extends React.Component {
     }
 
     handleOwnerChange(value) {
-        console.log("change happening")
-        console.log(value)
+        //console.log("change happening")
+        //console.log(value)
         this.setState({
             assignment: value.owner,
         });
@@ -194,9 +184,7 @@ class GetCardInfo extends React.Component {
     getUsers(input) {
 
         let self = this;
-        console.log(self);
         if (!input) {
-            console.log('here')
             return Promise.resolve({ options: [] });
         }
 
@@ -367,6 +355,92 @@ class ProjectManagement extends React.Component {
     }
 
     handleDragEnd = (cardId, sourceLaneId, targetLaneId) => {
+        var scard_lane;
+        switch (sourceLaneId) {
+            case "Backlog":
+                scard_lane = 0;
+                break;
+            case "Next":
+                scard_lane = 1;
+                break;
+            case "InProgress":
+                scard_lane = 2;
+                break;
+            case "Staged":
+                scard_lane = 3;
+                break;
+            case "QA":
+                scard_lane = 4;
+                break;
+            case "Live":
+                scard_lane = 5;
+                break;
+            default:
+                scard_lane = 0;
+        }
+        var tcard_lane;
+        switch (targetLaneId) {
+            case "Backlog":
+                tcard_lane = 0;
+                break;
+            case "Next":
+                tcard_lane = 1;
+                break;
+            case "InProgress":
+                tcard_lane = 2;
+                break;
+            case "Staged":
+                tcard_lane = 3;
+                break;
+            case "QA":
+                tcard_lane = 4;
+                break;
+            case "Live":
+                tcard_lane = 5;
+                break;
+            default:
+                tcard_lane = 0;
+        }
+        var source_cards = [];
+        var newcard = {};
+
+        for (let i = 0; i < this.state.lanes[scard_lane].cards.length; i++) {
+            source_cards[i] = this.state.lanes[scard_lane].cards[i];
+            console.log("my card")
+            console.log(source_cards[i]);
+        }
+        console.log(source_cards[0])
+        var index = source_cards.findIndex(x => x.id == cardId);
+        console.log(source_cards)
+        if (index > -1) {
+            newcard = source_cards[index];
+            source_cards.splice(index, 1);
+        }
+
+
+        var target_cards = [];
+        console.log("removing1")
+        console.log(this.state.lanes[tcard_lane].cards)
+        console.log(this.state.lanes[tcard_lane].cards[0])
+        for (let i = 0; i < this.state.lanes[tcard_lane].cards.length; i++) {
+            target_cards[i] = this.state.lanes[tcard_lane].target_cards[i];
+            console.log("my card")
+            console.log(target_cards[i]);
+        }
+        // console.log(target_cards[0])
+        // var index = target_cards.findIndex(x => x.id == cardId);
+        // console.log(target_cards)
+        // if (index > -1) {
+        //     target_cards.splice(index, 0, newcard);
+        // }
+
+        target_cards.push(newcard)
+        
+
+        console.log("removing")
+        console.log(this.state.lanes)
+        this.state.lanes[scard_lane].cards = source_cards;
+        this.state.lanes[tcard_lane].cards = target_cards;
         console.log('drag ended')
         console.log(`cardId: ${cardId}`)
         console.log(`sourceLaneId: ${sourceLaneId}`)
@@ -384,7 +458,6 @@ class ProjectManagement extends React.Component {
         ChatProj.getProjectData().then(function (data) {
 
             self.getData(data);
-            console.log(self.state.projects);
             mydata.lanes = self.state.lanes;
         },
             function (err) {
@@ -396,8 +469,6 @@ class ProjectManagement extends React.Component {
 
         Users.getCurUserCompany().then(function (company) {
             self.setState({ curUserCompany: company.val() })
-            console.log("MY COMPANY")
-            console.log(self.state.curUserCompany)
         }).catch(function (err) {
             console.log("Error:" + err)
         })
@@ -437,13 +508,12 @@ class ProjectManagement extends React.Component {
 
         }
         this.setState({ projectList: listProjArray });
-        console.log("ProjectData");
-        console.log(keys);
         if (this.state.startingProject != undefined) {
             this.displayedCards(this.state.startingProject);
         }
         else {
-            this.displayedCards(this.state.projectList[0])
+            //this.state.projectList[0]
+            this.displayedCards(undefined)
         }
 
         /*
@@ -465,30 +535,31 @@ class ProjectManagement extends React.Component {
     displayedCards(project) {
         this.removeAllCards();
         var projArray = [];
-        if (project.data != undefined) {
-            projArray.push(project.data.lanes);
-            this.state.lanes = projArray[0];
-            for (let i = 0; i < this.state.lanes.length; i++) {
-                if (this.state.lanes[i].cards != undefined) {
-                    for (let j = 0; j < this.state.lanes[i].cards.length; j++) {
-                        //renderCard(this.state.lanes[i].id, this.state.lanes[i].cards[j].id, this.state.lanes[i].cards[j].title, this.state.lanes[i].cards[j].description);
-                        renderCard(this.state.lanes[i].id, this.state.lanes[i].cards[j].id, this.state.lanes[i].cards[j].title, this.state.lanes[i].cards[j].description);
+        if (project != undefined) {
+            if (project.data != undefined) {
+                projArray.push(project.data.lanes);
+                this.state.lanes = projArray[0];
+                for (let i = 0; i < this.state.lanes.length; i++) {
+                    if (this.state.lanes[i].cards != undefined) {
+                        for (let j = 0; j < this.state.lanes[i].cards.length; j++) {
+                            //renderCard(this.state.lanes[i].id, this.state.lanes[i].cards[j].id, this.state.lanes[i].cards[j].title, this.state.lanes[i].cards[j].description);
+                            renderCard(this.state.lanes[i].id, this.state.lanes[i].cards[j].id, this.state.lanes[i].cards[j].title, this.state.lanes[i].cards[j].description, project.data);
 
+                        }
+                    }
+                    else {
+                        this.state.lanes[i].cards = [];
                     }
                 }
-                else {
-                    this.state.lanes[i].cards = [];
-                }
+
+
             }
-
-
+            this.setState({ projects: projArray });
+            this.setState({ curProject: project.key });
         }
-        console.log(this.state.projects);
         mydata.lanes = this.state.lanes;
-        this.setState({ projects: projArray });
-        this.setState({ curProject: project.key });
-        console.log(mydata.lanes);
-        console.log("HERE");
+
+
     }
 
     removeAllCards() {
@@ -583,7 +654,7 @@ class ProjectManagement extends React.Component {
                     <button className="pure-button pure-button-primary newCard pmbutton" onClick={() => { this.handleOpenModal(null, true, null) }} style={{ margin: 5 }}>Add New Card</button>
                     <div>
                         <ul className="projectList">
-                            {this.state.projectList.map(item => <li className="projects" onClick={() => { this.displayedCards(item); console.log(item); console.log("MY ITEMS") }}>
+                            {this.state.projectList.map(item => <li className="projects" onClick={() => { this.displayedCards(item) }}>
                                 {item.name}
                             </li>)}
                         </ul>
@@ -591,12 +662,10 @@ class ProjectManagement extends React.Component {
                 </div>
                 <Board
                     data={mydata}
-                    draggable={true}
-                    onDataChange={shouldReceiveNewData}
+                    draggable
                     handleDragStart={handleDragStart}
                     handleDragEnd={this.handleDragEnd}
-                    tagStyle={{ fontSize: '80%' }}
-                    onCardClick={(card, laneId) => this.handleOpenModal(card, false, laneId)}
+                    onCardClick={(card, laneId) => { this.handleOpenModal(card, false, laneId); console.log(card); console.log(laneId) }}
                     eventBusHandle={setEventBus}
                 />
                 <ReactModal
@@ -623,7 +692,7 @@ class ProjectManagement extends React.Component {
             </div>);
     }
 }
-
+//
 //this.handleToggleClick()
 
 export default ProjectManagement;

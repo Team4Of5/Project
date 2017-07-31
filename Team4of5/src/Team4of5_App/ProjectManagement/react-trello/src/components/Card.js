@@ -1,44 +1,31 @@
-import React, { Component, PropTypes } from 'react'
-import { CardWrapper, CardHeader, CardTitle, CardRightContent, Detail, Footer } from '../styles/Base'
-import { DragType } from '../helpers/DragType'
-import { DragSource, DropTarget } from 'react-dnd'
-import { findDOMNode } from 'react-dom'
+import React, {Component, PropTypes} from 'react'
+import {CardWrapper, CardHeader, CardTitle, CardRightContent, Detail, Footer} from '../styles/Base'
+import {DragType} from '../helpers/DragType'
+import {DragSource, DropTarget} from 'react-dnd'
+import {findDOMNode} from 'react-dom'
 import Tag from './Tag'
 var flow = require('lodash.flow')
 
 
 class Card extends Component {
-  renderBody = () => {
-    if (this.props.customCardLayout) {
-      const customCardWithProps = React.cloneElement(this.props.customCard, { ...this.props })
-      return <span>{customCardWithProps}</span>
-    } else {
-      const { title, description, label, tags } = this.props
-      return (
-        <span>
-          <CardHeader>
-            <CardTitle>{title}</CardTitle>
-            <CardRightContent>{label}</CardRightContent>
-          </CardHeader>
-          <Detail>{description}</Detail>
-          {tags &&
-            <Footer>
-              {tags.map(tag => <Tag key={tag.title} {...tag} tagStyle={this.props.tagStyle} />)}
-            </Footer>}
-        </span>
-      )
-    }
-  }
 
   render () {
-    const { id, connectDragSource, connectDropTarget, isDragging, cardStyle, ...otherProps } = this.props
+    const {id, title, description, label, tags, connectDragSource, connectDropTarget, isDragging, ...otherProps} = this.props
     const opacity = isDragging ? 0 : 1
     const background = isDragging ? '#CCC' : '#E3E3E3'
     return connectDragSource(
       connectDropTarget(
-        <div style={{ background: background }}>
-          <CardWrapper key={id} data-id={id} {...otherProps} style={{ ...cardStyle, opacity: opacity }}>
-            {this.renderBody()}
+        <div style={{background: background}}>
+          <CardWrapper key={id} data-id={id} {...otherProps} style={{opacity: opacity}}>
+            <CardHeader>
+              <CardTitle>{title}</CardTitle>
+              <CardRightContent>{label}</CardRightContent>
+            </CardHeader>
+            <Detail>{description}</Detail>
+            {tags && <Footer>
+              {tags.map((tag) => <Tag key={tag.title} {...tag} tagStyle={this.props.tagStyle} />)}
+            </Footer>
+            }
           </CardWrapper>
         </div>
       )
@@ -64,14 +51,8 @@ const cardSource = {
   endDrag (props, monitor) {
     const item = monitor.getItem()
     const dropResult = monitor.getDropResult()
-    console.log("Card.js")
-    console.log(monitor)
-    console.log(dropResult.listId)
-    console.log(item.listId)
     if (dropResult && dropResult.listId !== item.listId) {
-      console.log("I AM REMOVING")
       props.removeCard(item.listId, item.id)
-      props.myfunc(props.index,dropResult.listId)
     }
     props.handleDragEnd(item.id, item.listId, dropResult ? dropResult.listId : item.listId)
   }
@@ -112,6 +93,7 @@ const cardTarget = {
     if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
       return
     }
+
     if (props.listId === sourceListId) {
       props.moveCard(dragIndex, hoverIndex)
       monitor.getItem().index = hoverIndex
@@ -119,14 +101,9 @@ const cardTarget = {
   }
 }
 
-Card.defaultProps = {
-  cardStyle: {},
-  customCardLayout: false
-}
-
 Card.propTypes = {
   id: PropTypes.string.isRequired,
-  title: PropTypes.string,
+  title: PropTypes.string.isRequired,
   description: PropTypes.string,
   label: PropTypes.string,
   onClick: PropTypes.func,
@@ -134,9 +111,7 @@ Card.propTypes = {
   connectDragSource: PropTypes.func.isRequired,
   isDragging: PropTypes.bool.isRequired,
   handleDragStart: React.PropTypes.func,
-  handleDragEnd: React.PropTypes.func,
-  customCardLayout: React.PropTypes.bool,
-  customCard: React.PropTypes.node
+  handleDragEnd: React.PropTypes.func
 }
 
 export default flow(
