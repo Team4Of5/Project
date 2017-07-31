@@ -8,13 +8,12 @@ import IssueTrackerNav from './IssueTrackerNav.js';
 import IssueTrackerBody from './IssueTrackerBody.js';
 
 
-
 class IssueTracker extends React.Component {
   constructor(props){
 		super(props);
   }
 
-
+// Nesting Issue tracker with others
   render() {
 
     return (
@@ -23,7 +22,7 @@ class IssueTracker extends React.Component {
 
       <div>
         <div className='tableBody'>
-            {/* <BugTrackingTableBody /> */}
+
             <IssueTrackerBody />
         </div>
 
