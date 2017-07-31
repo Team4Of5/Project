@@ -22,6 +22,7 @@ class  IssueTrackerNav extends React.Component {
 render(){
 
 return (
+    // Those are the tabs 
       <div>
         <Nav bsStyle="tabs" >
             <LinkContainer  to='/menu/IssueTracker'>

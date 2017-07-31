@@ -4,6 +4,7 @@ import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 //import css
 import './IssueTracker.css';
 
+//wiki type table
 const IssueTypeData=[
     {
         id:1,
@@ -31,6 +32,7 @@ const IssueTypeData=[
         type: "Cosmetic issues. Scroll bars appearing where they should not, window does not remember saved size/location, typos, last character of a label being cut off, that sort of thing. ",
     },
 ]
+//wiki Priority tabel
 const IssuePriorityData=[
     {
         id:1,
@@ -58,6 +60,7 @@ const IssuePriorityData=[
         type: " Don't work on it now.",
     },
 ]
+//wiki Severity table
 const IssueSeverityData=[
     {
         id:1,
