@@ -88,12 +88,14 @@ class ProjectSummary extends React.Component {
         function data(item) {
             var labels = ['Backlog', 'Next', 'In Progress', 'Staged', 'QA', 'Live'];
             var series = [];
-            for (var i = 0; i < item.data.lanes.length; i++) {
-                if(item.data.lanes[i].cards != undefined) {
-                    series.push(item.data.lanes[i].cards.length);
-                }
-                else {
-                    series.push(0);
+            if (item.data != undefined) {
+                for (var i = 0; i < item.data.lanes.length; i++) {
+                    if (item.data.lanes[i].cards != undefined) {
+                        series.push(item.data.lanes[i].cards.length);
+                    }
+                    else {
+                        series.push(0);
+                    }
                 }
             }
             //var series =  [item.data.lanes[0].cards.length, item.data.lanes[1].cards.length, item.data.lanes[2].cards.length, item.data.lanes[3].cards.length, item.data.lanes[4].cards.length, item.data.lanes[5].cards.length];
@@ -126,15 +128,15 @@ class ProjectSummary extends React.Component {
                     {this.state.projectList.map(item => <div className="chartImage panel panel-primary" >
                         <div className="panel-heading clearfix">
                             <h1 className='panel-title pull-left'>
-                            {item.name}
+                                {item.name}
                             </h1>
                         </div>
                         <div className='panel-body'>
-                        <ChartistGraph
-                            data={data(item)}
-                            type={'Pie'}
-                            style={style}
-                        />
+                            <ChartistGraph
+                                data={data(item)}
+                                type={'Pie'}
+                                style={style}
+                            />
                         </div>
                     </div>)}
                 </div>
