@@ -172,8 +172,14 @@ componentDidMount() {
         var issuedate_reformat = new Date(issuedata[k].issuedate);
         issuedate_reformat =  (issuedate_reformat.getMonth() + 1) + '/' + (issuedate_reformat.getDate() +1) + '/'+ issuedate_reformat.getFullYear();
 
+        if (issuedata[k].completionDate == 'null') {
+        var completionDate_reformat = 'N/A'
+        }
+        else{
         var completionDate_reformat = new Date(issuedata[k].completionDate);
+
         completionDate_reformat =  (completionDate_reformat.getMonth() + 1) + '/' + (completionDate_reformat.getDate()+1) + '/'+ completionDate_reformat.getFullYear();
+        }
         for (var y = 0; y< this.state.projdata.length; y++){
           if (this.state.projdata[y].name == issuedata[k].project){
               projMatch= true
@@ -238,7 +244,7 @@ return (
         multiColumnSearch={ true }
         >
 
-        <TableHeaderColumn dataField='id' isKey={true} width='200'>ID</TableHeaderColumn>
+        <TableHeaderColumn dataField='id' isKey={true} width='100'>ID</TableHeaderColumn>
         <TableHeaderColumn dataField='status'
             editable={ { type: 'select', options: { values: issueStatus },
             defaultValue: 'C' }}
@@ -259,12 +265,12 @@ return (
             defaultValue: 'A' }}
             dataSort={true}
             >Severity</TableHeaderColumn>
-        <TableHeaderColumn dataField='owner' dataSort={true} tdStyle={ { whiteSpace: 'nowrap' } }>Owner</TableHeaderColumn>
+        <TableHeaderColumn dataField='owner' dataSort={true} tdStyle={ { whiteSpace: 'nowrap' } } width='150'>Owner</TableHeaderColumn>
         <TableHeaderColumn dataField='issueDate' dataSort={true}>IssueDate</TableHeaderColumn>
         <TableHeaderColumn dataField='expComDate' dataSort={true}>Expected Completed in Days</TableHeaderColumn>
         <TableHeaderColumn dataField='details' filter={ { type: 'TextFilter', style: issueFilterStyle} } tdStyle={ { whiteSpace: 'normal' } } width='250'>Details</TableHeaderColumn>
         <TableHeaderColumn dataField='completionDate' dataSort={true} >Actual Completion Date</TableHeaderColumn>
-        <TableHeaderColumn dataField='project' filter={ { type: 'TextFilter', style: issueFilterStyle} } tdStyle={ { whiteSpace: 'nowrap' } } width='200'>Project</TableHeaderColumn>
+        <TableHeaderColumn dataField='project' filter={ { type: 'TextFilter', style: issueFilterStyle} } tdStyle={ { whiteSpace: 'nowrap' } } width='100'>Project</TableHeaderColumn>
 
       </BootstrapTable>
       </div>
