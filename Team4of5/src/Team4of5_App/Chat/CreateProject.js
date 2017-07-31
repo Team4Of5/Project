@@ -115,17 +115,18 @@ class CreateProject extends React.Component {
             <div className="panel panel-info" id="title">
                 <div className="panel-heading clearfix">
                 <h1  className="panel-title">Create a New Project</h1>
+                <p>Please Select members from your chat contact list</p>
             </div>
             <div className="panel-body">
 
-                <FormControl style={style} 
+                <FormControl style={style}
                      inputRef={title => this.state.inputTitle = title}
                      placeholder="Project Name" className="message-input" />
 
                 <Select multi={true}
                     disabled={false}
                     value={this.state.value}
-                    placeholder="Select your members"
+                    placeholder="Select members from Chat Create Project"
                     options={this.state.options}
                     onChange={this.handleSelectChange} />
 
