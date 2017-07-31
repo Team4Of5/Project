@@ -420,12 +420,12 @@ class ProjectManagement extends React.Component {
 
         var target_cards = [];
         console.log("removing1")
-        console.log(this.state.lanes[tcard_lane].cards)
-        console.log(this.state.lanes[tcard_lane].cards[0])
-        for (let i = 0; i < this.state.lanes[tcard_lane].cards.length; i++) {
-            target_cards[i] = this.state.lanes[tcard_lane].target_cards[i];
-            console.log("my card")
-            console.log(target_cards[i]);
+        if (this.state.lanes != undefined) {
+            for (let i = 0; i < this.state.lanes[tcard_lane].cards.length; i++) {
+                target_cards[i] = this.state.lanes[tcard_lane].cards[i];
+                console.log("my card")
+                console.log(target_cards[i]);
+            }
         }
         // console.log(target_cards[0])
         // var index = target_cards.findIndex(x => x.id == cardId);
@@ -435,7 +435,7 @@ class ProjectManagement extends React.Component {
         // }
 
         target_cards.push(newcard)
-        
+
 
         console.log("removing")
         console.log(this.state.lanes)
@@ -538,6 +538,7 @@ class ProjectManagement extends React.Component {
         if (project != undefined) {
             if (project.data != undefined) {
                 projArray.push(project.data.lanes);
+                console.log(projArray);
                 this.state.lanes = projArray[0];
                 for (let i = 0; i < this.state.lanes.length; i++) {
                     if (this.state.lanes[i].cards != undefined) {
@@ -568,6 +569,7 @@ class ProjectManagement extends React.Component {
                 if (this.state.lanes[i].cards != undefined) {
                     for (let j = 0; j < this.state.lanes[i].cards.length; j++) {
                         removeCard(this.state.lanes[i].id, this.state.lanes[i].cards[j].id);
+                        //removeCard(mydata.lanes[i].id, mydata.lanes[i].cards[j].id);
                     }
                 }
             }
@@ -609,10 +611,49 @@ class ProjectManagement extends React.Component {
                 // We call resolve(...) when what we were doing made async successful, and reject(...) when it failed.
                 // In this example, we use setTimeout(...) to simulate async code. 
                 // In reality, you will probably be using something like XHR or an HTML5 API.
+                var dcard_lane;
+                switch (laneId) {
+                    case "Backlog":
+                        dcard_lane = 0;
+                        break;
+                    case "Next":
+                        dcard_lane = 1;
+                        break;
+                    case "InProgress":
+                        dcard_lane = 2;
+                        break;
+                    case "Staged":
+                        dcard_lane = 3;
+                        break;
+                    case "QA":
+                        dcard_lane = 4;
+                        break;
+                    case "Live":
+                        dcard_lane = 5;
+                        break;
+                    default:
+                        dcard_lane = 0;
+                }
+                mydata.lanes[dcard_lane].cards.push({ description: description, id: id, title: title });
+                this.state.lanes[dcard_lane].cards.push({ description: description, id: id, title: title, label: "" });
+                console.log("Here is project List");
+                var index = this.state.projectList.findIndex(x => x.key == this.state.curProject);
+                console.log(this.state.projectList.findIndex(x => x.key == this.state.curProject))
+                //this.state.projectList[index].data.lanes[card_lane].cards.push({ description: description, id: newId, title: title });
+                console.log(this.state.projectList[index].data.lanes[dcard_lane].cards);
+
+                var cards = this.state.projectList[index].data.lanes[dcard_lane].cards;
+                var newcard = {};
+
+                console.log(cards[0])
+                let ind = cards.findIndex(x => x.id == id);
+                console.log(cards)
+                if (ind > -1) {
+                    newcard = cards[ind];
+                    cards.splice(ind, 1);
+                }
+                this.state.projectList[index].data.lanes[dcard_lane].cards = cards;
                 deleteCard(laneId, id, title, description, this.state.curProject);
-                setTimeout(function () {
-                    resolve(); // Yay! Everything went well!
-                }, 250);
             });
 
             myFirstPromise.then(() => {
@@ -625,12 +666,93 @@ class ProjectManagement extends React.Component {
             //deleteCard(laneId, id, title, description);
             //addCard(laneId, id, title, description);
         }
+        var card_lane;
+        switch (laneId) {
+            case "Backlog":
+                card_lane = 0;
+                break;
+            case "Next":
+                card_lane = 1;
+                break;
+            case "InProgress":
+                card_lane = 2;
+                break;
+            case "Staged":
+                card_lane = 3;
+                break;
+            case "QA":
+                card_lane = 4;
+                break;
+            case "Live":
+                card_lane = 5;
+                break;
+            default:
+                card_lane = 0;
+        }
+        mydata.lanes[card_lane].cards.push({ description: description, id: newId, label: title });
+        this.state.lanes[card_lane].cards.push({ description: description, id: newId, title: title});
+        console.log("Here is project List");
+        console.log(this.state.projectList)
+        var index = this.state.projectList.findIndex(x => x.key == this.state.curProject);
+        console.log(this.state.projectList.findIndex(x => x.key == this.state.curProject))
+        if(this.state.projectList[index].data == undefined) {
+            this.state.projectList[index].data = mydata;
+        }
+        if (index > -1) {
+            this.state.projectList[index].data.lanes[card_lane].cards.push({ description: description, id: newId, title: title });
+            console.log(this.state.projectList[index].data.lanes[card_lane].cards);
+        }
+
+
 
         this.setState({ showModal: false });
     }
 
 
     handleDeleteModal(laneId, id, title, description) {
+
+        var card_lane;
+        switch (laneId) {
+            case "Backlog":
+                card_lane = 0;
+                break;
+            case "Next":
+                card_lane = 1;
+                break;
+            case "InProgress":
+                card_lane = 2;
+                break;
+            case "Staged":
+                card_lane = 3;
+                break;
+            case "QA":
+                card_lane = 4;
+                break;
+            case "Live":
+                card_lane = 5;
+                break;
+            default:
+                card_lane = 0;
+        }
+        mydata.lanes[card_lane].cards.push({ description: description, id: id, title: title });
+        this.state.lanes[card_lane].cards.push({ description: description, id: id, title: title, label: "" });
+        console.log("Here is project List");
+        var index = this.state.projectList.findIndex(x => x.key == this.state.curProject);
+        console.log(this.state.projectList.findIndex(x => x.key == this.state.curProject))
+        //this.state.projectList[index].data.lanes[card_lane].cards.push({ description: description, id: newId, title: title });
+        console.log(this.state.projectList[index].data.lanes[card_lane].cards);
+
+        var cards = this.state.projectList[index].data.lanes[card_lane].cards;
+        var newcard = {};
+
+        console.log(cards[0])
+        var ind = cards.findIndex(x => x.id == id);
+        console.log(cards)
+        if (ind > -1) {
+            newcard = cards[ind];
+            cards.splice(ind, 1);
+        }
+        this.state.projectList[index].data.lanes[card_lane].cards = cards;
         deleteCard(laneId, id, title, description, this.state.curProject)
         this.setState({ showModal: false });
     }
