@@ -6,8 +6,6 @@ import {
     BrowserRouter as Router,
     Route,
     Link,
-    Redirect,
-    Switch,
     NavLink
 } from 'react-router-dom';
 import IssueReports from './IssueReports.js';
