@@ -217,7 +217,7 @@ class Contact extends React.Component {
         return (
             <div className="panel panel-info">
                     <div className="panel-heading clearfix">
-                <h1 className="panel-title">Contact</h1>
+                <h1 className="panel-title">Contacts</h1>
                 </div>
                 <Grid>
 

@@ -113,7 +113,7 @@ class UserLoginSignup extends React.Component {
       Users.sign_in_user(this.state.email, this.state.password)
       .then((User) => {
         console.log(User);
-        alert("Login Succeed!!");
+        //alert("Login Succeed!!");
           console.log('User Confirm!!');
           //handle redirect
           ChatService.listenCurUserOnOffline();
@@ -128,9 +128,13 @@ class UserLoginSignup extends React.Component {
       Users.create_user(this.state.email, this.state.password)
         .then((User) => {
           console.log(User);
-          alert('Sign Up Succeed!!');
+          alert('Sign up succeeded, please login');
         }).then((User) => {
         Users.saveUserinfo();
+        })
+        .then((User) => {
+          this.setState({email: ''});
+          this.setState({password: ''});
         })
         .catch((error) => {
           console.log(error);
@@ -203,7 +207,7 @@ class UserLoginSignup extends React.Component {
          <Glyphicon glyph="lock" />
          </InputGroup.Addon>
        <FormControl type="password" placeholder="Password" name="password"
-           value={this.state.first_name} onChange={this.handleChange}/>
+           value={this.state.password} onChange={this.handleChange}/>
 
 </InputGroup>
      </Col>

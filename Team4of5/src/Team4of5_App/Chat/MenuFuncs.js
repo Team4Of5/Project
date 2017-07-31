@@ -128,7 +128,7 @@ class MenuFuncs extends React.Component {
                     <Col xs={1} md={1}><button className="menuBtn"
                         //!!! Name tag cannot be removed name={["GotoContact"]}
 
-                        onClick={() => { return this.props.SwitchAction({ GotoContent: "GotoContact" }) }}>Contact</button></Col>
+                        onClick={() => { return this.props.SwitchAction({ GotoContent: "GotoContact" }) }}>Contacts</button></Col>
 
                 </Row>
                 <Row id='funcsRow'>
@@ -139,7 +139,7 @@ class MenuFuncs extends React.Component {
                         //I found the trick, use the name to pass the data to the component
 
                         //name={["GotoAdd", "123"]}
-                        onClick={() => { return this.props.SwitchAction({ GotoContent: "GotoAdd" }) }}>Add</button></Col>
+                        onClick={() => { return this.props.SwitchAction({ GotoContent: "GotoAdd" }) }}>Add Contact</button></Col>
                 </Row>
                 <Row id='funcsRow'>
                     <Col xs={1} md={1}> <Media.Left>

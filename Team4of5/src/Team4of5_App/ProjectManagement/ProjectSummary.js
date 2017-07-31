@@ -106,8 +106,8 @@ class ProjectSummary extends React.Component {
         };
         var type = 'Pie';
         var style = {
-            height: 500,
-            width: 500
+            height:300,
+            width: 300
         }
         return (
 
