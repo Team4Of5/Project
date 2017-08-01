@@ -102,6 +102,7 @@ class MenuFuncs extends React.Component {
                         <div >
                             <h4>{this.state.userInfo[0]}</h4>
                             <Select
+                                className="statusDropdown"
                                 style={{ width: 150 }}
                                 autosize
                                 ref="stateSelect"

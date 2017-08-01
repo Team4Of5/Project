@@ -8,6 +8,9 @@
     margin-bottom: 30px;
 }
 
+.statusDropdown{
+  z-index: 2;
+}
 
 .selected-state{
     width: 15px
