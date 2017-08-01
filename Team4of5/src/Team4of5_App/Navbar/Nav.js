@@ -106,7 +106,9 @@ class NavbarHeaderC extends React.Component {
 
 
               <LinkContainer  to='/login'>
-              <MenuItem  eventKey={5.2}>Logout</MenuItem>
+              <MenuItem  eventKey={5.2} onClick={()=>{
+                userService.logoutUser();
+              }}>Logout</MenuItem>
           </LinkContainer>
 
             </NavDropdown>

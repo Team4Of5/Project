@@ -14,7 +14,7 @@ firebase.auth().onAuthStateChanged(function (user) {
     if (user) {
         localStorage.setItem("currentUser", JSON.stringify(user))
     } else {
-        localStorage.setItem("currentUser", "")
+        localStorage.clear();
     }
 
 });
@@ -181,6 +181,7 @@ export const updateSettings = function (user_display_name, user_role) {
 // it shouldn't need any parameters if the user is logged in
 export const logoutUser = function () {
     firebase.database().ref("presence/" + getCurrentUser().uid).set(false);
+    localStorage.clear();
     return firebase.auth().signOut();
 }
 
