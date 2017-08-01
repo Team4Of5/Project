@@ -225,7 +225,7 @@ export const updateContactUserName = function () {
     contactRef.child(getCurrentUser().uid).once('value').then((data) => {
         let contactList = data.val();
         for (let index in contactList) {
-            if (contactList[index].type != "Project") {
+            if (contactList[index].type != "Project" && index!="status") {
                 contactRef.child(index).child(getCurrentUser().uid).update({
                     name: getCurrentUser().displayName
                 });
