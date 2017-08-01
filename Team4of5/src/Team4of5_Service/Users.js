@@ -3,7 +3,6 @@
 import * as firebase from 'firebase';
 import * as Config from './Config.js';
 
-
 firebase.initializeApp(Config.firebase_config);
 var ref = firebase.app().database().ref();
 var usersRef = ref.child('users');
@@ -12,12 +11,12 @@ var issueRef = ref.child('issues');
 const issueStatus = ['New', 'Open', 'Assiged', 'Fixed', 'Verified', 'Closed'];
 
 firebase.auth().onAuthStateChanged(function (user) {
-    if(user){
+    if (user) {
         localStorage.setItem("currentUser", JSON.stringify(user))
-    }else{
+    } else {
         localStorage.setItem("currentUser", "")
     }
-    
+
 });
 
 export const create_user = function (user_email, user_pass) {
@@ -41,6 +40,7 @@ export const saveUserinfo = function () {
                 last_login_dtm: Date.now(),
                 email: user_email
             });
+
             thisUserRef.on("value", function (snapshot) {
                 var role = snapshot.val().role;
                 var company = snapshot.val().company
@@ -48,8 +48,18 @@ export const saveUserinfo = function () {
                     thisUserRef.update({
                         role: 'Customer'
                     });
-
-
+                }
+                let displayName = snapshot.val().display_name;
+                if (displayName == null) {
+                    let tempUserDName = user_email.split("@")[0];
+                    user.updateProfile({
+                        displayName: tempUserDName
+                    }).then(() => {
+                        thisUserRef.update({
+                            display_name: tempUserDName
+                        });
+                        updateContactUserName();
+                    })
 
                 }
             });
@@ -150,6 +160,7 @@ export const updateSettings = function (user_display_name, user_role) {
             displayName: user_display_name
         }).then(function () {
             // Update successful.
+            updateContactUserName();
         }, function (error) {
             // An error happened.
         });
@@ -185,12 +196,12 @@ export const getUserData = function () {
 
 
 export const getCurrentUser = function () {
-    if(firebase.auth().currentUser != null){
+    if (firebase.auth().currentUser != null) {
         return firebase.auth().currentUser;
     }
-    else if(JSON.parse(localStorage.getItem("currentUser") != "")){
+    else if (JSON.parse(localStorage.getItem("currentUser") != "")) {
         return JSON.parse(localStorage.getItem("currentUser"))
-    }else{
+    } else {
         console.log("User loggout!!!")
     }
 }
@@ -209,4 +220,14 @@ export const getAllUsersData = function () {
 }
 
 
-
+export const updateContactUserName = function(){
+    let contactRef = ref.child('chatContact');
+    contactRef.child(getCurrentUser().uid).once('value').then((data)=>{
+        let contactList = data.val();
+        for(let index in contactList){
+            contactRef.child(index).child(getCurrentUser().uid).update({
+                name:getCurrentUser().displayName
+            });
+        }
+    });
+}
