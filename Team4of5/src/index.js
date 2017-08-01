@@ -24,14 +24,17 @@ import RouteMap from './Team4of5_App/RouteMap.js';
 import Menu from './Team4of5_App/Menu.js';
 import UserLoginSignup from './Team4of5_App/UserLoginSignup/UserLoginSignup.js'
 
-ReactDOM.render(
 
+
+ReactDOM.render(
+ 
  <Router>
     <div>
 
       <Route path="/login" component={UserLoginSignup}/>
       <Route path="/menu" component={Menu}/>
-      <Redirect to="/login"/>
+      <Redirect to= {(localStorage.getItem("currentUser") == null || localStorage.getItem("currentUser") == ""
+      ) ? "/login" : "/menu"}/>
 
     </div>
   </Router>,

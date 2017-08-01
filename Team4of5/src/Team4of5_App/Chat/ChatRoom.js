@@ -154,7 +154,9 @@ class ChatRoom extends React.Component {
         
         //Scroll to buttom
         let room = this.refs.roomView;
-        room.scrollTop = room.scrollHeight;
+        if(room != undefined){
+             room.scrollTop = room.scrollHeight;
+        }
     }
 
     _onPress(user) {

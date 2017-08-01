@@ -2,6 +2,7 @@
 import * as firebase from 'firebase';
 import * as Config from './Config.js';
 import * as Tools from '../Team4of5_App/Tools.js';
+import * as userService from './Users.js';
 
 let ref = firebase.app().database().ref();
 let usersRef = ref.child('users');
@@ -19,11 +20,11 @@ export const listenOnOffline = function (Uuid) {
 
 export const listenCurUserOnOffline = function () {
     let amOnline = firebase.database().ref(".info/connected");
-    let userRef = firebase.database().ref("presence/" + firebase.auth().currentUser.uid);
+    let userRef = firebase.database().ref("presence/" + userService.getCurrentUser().uid);
     amOnline.on('value', function (snapshot) {
         if (snapshot.val()) {
 
-            contactRef.child(firebase.auth().currentUser.uid).child('status').once('value').then(function (status) {
+            contactRef.child(userService.getCurrentUser().uid).child('status').once('value').then(function (status) {
                 if (status.val() != null && status.val() == 'Active') {
                     console.log("connected");
                     userRef.onDisconnect().remove();
@@ -42,7 +43,7 @@ export const listenCurUserOnOffline = function () {
 //History
 export const listenHistoryChange = function (chatRoomUid) {
 
-    return historyRef.child(firebase.auth().currentUser.uid)
+    return historyRef.child(userService.getCurrentUser().uid)
 }
 
 export const updateHistory = function (chatroomUid, lastMsg) {
@@ -70,7 +71,7 @@ export const queryChatHistory = function () {
     return new Promise(function (resolve, reject) {
         try {
             let hisData = [];
-            contactRef.child(firebase.auth().currentUser.uid).once('value').then(function (data) {
+            contactRef.child(userService.getCurrentUser().uid).once('value').then(function (data) {
                 let contactData = data.val();
                 let count = 0;
                 let dataSize = 0;
@@ -200,7 +201,7 @@ export const createProject = function (memberUids, projectName) {
             thisProjectRef.update(pMembersUpdate);
 
             //auto included the current user into the project
-            memberUids.push(firebase.auth().currentUser.uid);
+            memberUids.push(userService.getCurrentUser().uid);
             //No need to save name there, users may update their display names
             pMembersUpdate = {
                 members: memberUids
@@ -222,7 +223,7 @@ export const createProject = function (memberUids, projectName) {
 
 //Chatroom related
 export const checkSenderIsCurrentUser = function (senderUid) {
-    return (senderUid == firebase.auth().currentUser.uid)
+    return (senderUid == userService.getCurrentUser().uid)
 }
 
 export const listenChatRoomChange = function (chatRoomUid) {
@@ -239,9 +240,9 @@ export const pushMsg = function (msg, chatRoomUid) {
             let timestamp = Date.now();
             chatroomRef.child(chatRoomUid).child('messages').update({
                 [timestamp]: {
-                    senderUid: firebase.auth().currentUser.uid,
+                    senderUid: userService.getCurrentUser().uid,
                     content: msg,
-                    senderName: firebase.auth().currentUser.displayName
+                    senderName: userService.getCurrentUser().displayName
                 }
             });
             return resolve();
@@ -307,7 +308,7 @@ export const getChatroomMsg = function (contact, chatRoomUid) {
                 if (data.val() == null) {
 
                     let membersUpdate = {}
-                    let currentUserUid = firebase.auth().currentUser.uid;
+                    let currentUserUid = userService.getCurrentUser().uid;
 
 
 
@@ -385,19 +386,19 @@ const addProjectToContact = function (projectUid, userUid, projectName, pRoomUid
 }
 
 export const getUserStatus = function () {
-    return contactRef.child(firebase.auth().currentUser.uid).child('status').once('value')
+    return contactRef.child(userService.getCurrentUser().uid).child('status').once('value')
 }
 
 export const updateStatus = function (status) {
     return new Promise(function (resolve, reject) {
         try {
-            contactRef.child(firebase.auth().currentUser.uid).update({
+            contactRef.child(userService.getCurrentUser().uid).update({
                 status: status
             })
             if (status == 'Active') {
-                firebase.database().ref("presence/" + firebase.auth().currentUser.uid).set(true)
+                firebase.database().ref("presence/" + userService.getCurrentUser().uid).set(true)
             } else {
-                firebase.database().ref("presence/" + firebase.auth().currentUser.uid).set(false)
+                firebase.database().ref("presence/" + userService.getCurrentUser().uid).set(false)
             }
             return resolve();
         } catch (err) {
@@ -408,7 +409,7 @@ export const updateStatus = function (status) {
 
 export const addContact = function (contactUid, type) {
     return new Promise(function (resolve, reject) {
-        let user = firebase.auth().currentUser;
+        let user = userService.getCurrentUser();
         if (contactUid == user.uid) return reject("You cannot add yourself!!!")
 
         contactRef.child(user.uid).child(contactUid).once('value').then(function (data) {
@@ -456,10 +457,8 @@ export const addContact = function (contactUid, type) {
 }
 
 export const getUserContacts = function () {
-    console.log(firebase.auth().currentUser)
     return new Promise(function (resolve, reject) {
-        console.log(firebase.auth().currentUser.uid)
-        contactRef.child(firebase.auth().currentUser.uid).once('value').then(function (data) {
+        contactRef.child(userService.getCurrentUser().uid).once('value').then(function (data) {
             console.log(data.val());
             return resolve(data.val())
         }, (err) => {
