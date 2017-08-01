@@ -220,14 +220,16 @@ export const getAllUsersData = function () {
 }
 
 
-export const updateContactUserName = function(){
+export const updateContactUserName = function () {
     let contactRef = ref.child('chatContact');
-    contactRef.child(getCurrentUser().uid).once('value').then((data)=>{
+    contactRef.child(getCurrentUser().uid).once('value').then((data) => {
         let contactList = data.val();
-        for(let index in contactList){
-            contactRef.child(index).child(getCurrentUser().uid).update({
-                name:getCurrentUser().displayName
-            });
+        for (let index in contactList) {
+            if (contactList[index].type != "Project") {
+                contactRef.child(index).child(getCurrentUser().uid).update({
+                    name: getCurrentUser().displayName
+                });
+            }
         }
     });
 }
