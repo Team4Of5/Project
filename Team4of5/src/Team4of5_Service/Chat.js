@@ -156,20 +156,20 @@ export const checkProjectNameExist = function (newName) {
         try {
             let size = 0
             let count = 0
-            projectRef.once('value').then(function (data){
-                for(let key in data.val()){
+            projectRef.once('value').then(function (data) {
+                for (let key in data.val()) {
                     size = size + 1
-                    getProjectName(key).then(function(pName){
+                    getProjectName(key).then(function (pName) {
                         count = count + 1;
-                        if(pName.val() == newName){
+                        if (pName.val() == newName) {
                             return reject('Project name already existed, change your project name!!')
                         }
-                        if(count == size){
+                        if (count == size) {
                             return resolve();
                         }
                     })
                 }
-            }) 
+            })
         } catch (err) {
             return reject(err)
         }
@@ -255,10 +255,14 @@ export const pushMsg = function (msg, chatRoomUid) {
 }
 
 //must be called after chatroom has been created
-export const getChatroomMembers = function (chatRoomUid) {
+export const getChatRoomMembers = function (chatRoomUid) {
     return new Promise(function (resolve, reject) {
         try {
+            console.log("getProjectMembers2")
+            console.log(chatRoomUid)
             chatroomRef.child(chatRoomUid).child('members').once('value').then(function (data) {
+                console.log("getProjectMembers3")
+                console.log(data.val())
                 let userDNames = [];
                 let totalSize = 0;
                 let count = 0;
@@ -271,13 +275,14 @@ export const getChatroomMembers = function (chatRoomUid) {
                 for (let key in data.val()) {
                     totalSize = totalSize + 1
                     getUserName(key).then(function (UserDName) {
+                        console.log(UserDName.val())
                         if (UserDName.val() != null) {
 
-                            userDNames.push(UserDName.val());
+                            userDNames[key] = UserDName.val();
                             check()
                         } else {
                             getUserEmail(key).then(function (userEmail) {
-                                userDNames.push(UserDName.val());
+                                userDNames[key] = userEmail.val();
                                 check()
                             }).catch(function (err) {
                                 return reject(err)
@@ -318,10 +323,15 @@ export const getChatroomMsg = function (contact, chatRoomUid) {
                     }
                     // contactData = [{ uid: this.props.extraData.ContactUid, data: this.props.extraData.ContactData }];
                     console.log("0:")
+
+
                     if (contact.data.type == 'Project') {
                         console.log("0-1")
                         projectRef.child(contact.uid).child('members').once('value').then(function (Uuids) {
                             console.log("1:")
+
+
+
                             for (let i = 0; i < Uuids.val().length; i++) {
                                 console.log("2:")
                                 if (Uuids.val()[i] != currentUserUid) {
@@ -337,6 +347,7 @@ export const getChatroomMsg = function (contact, chatRoomUid) {
                                     })
                                 }
                             }
+
                         }).catch(function (err) {
                             return reject(err);
                         })
@@ -345,12 +356,15 @@ export const getChatroomMsg = function (contact, chatRoomUid) {
                             name: contact.data.name,
                             status: 'online'
                         }
+                        thisContactRef.update(membersUpdate);
                     }
-                    console.log("4")
-                    thisContactRef.update(membersUpdate);
 
-                    //If new chat room created, create history at the same time
-                    updateHistory(chatRoomUid, '');
+
+
+                    setTimeout(function () {
+                         updateHistory(chatRoomUid, '');
+                    }, 500);
+
 
                     return resolve('');
                 } else {

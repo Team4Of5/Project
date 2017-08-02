@@ -39,6 +39,7 @@ class ChatRoom extends React.Component {
         super(props)
         this.state = {
             members: [],
+            memberNames: [],
             hasInit: false,
             messages: [
                 //(new Message({ id: 1, message: "Hey guys!!!!!!" })),
@@ -79,44 +80,66 @@ class ChatRoom extends React.Component {
         ChatService.getChatroomMsg(contactData, this.props.extraData.ContactData.chatroomUid).
             then(function (messages) {
                 console.log(messages)
-
-                for (let index in messages) {
-                    self.addMsgToRoom(messages[index]);
+                if (self.props.extraData.ContactData.type != "Project") {
+                    for (let index in messages) {
+                        self.addMsgToRoom(messages[index]);
+                    }
+                    self.setState({ hasLoadHistoryMsg: true })
                 }
 
+                return messages
                 // //Scroll to buttom
                 // let room = self.refs.roomView;
                 // room.scrollTop = room.scrollHeight;
-            }).then(() => {
-                
-                if (this.props.extraData.ContactData.type == "Project") {
-                    ChatService.getChatroomMembers(this.props.extraData.ContactData.chatroomUid).then(function (memData) {
-                        self.setState(self.state.members = [])
-                        for (let i = 0; i < memData.length; i++) {
-                            self.state.members.push({ value: memData[i], label: memData[i] })
-                        }
-                        self.setState(self.state)
-                    })
+            }).then((messages) => {
+                console.log("Get members!!!!1")
+                console.log(self.props.extraData.ContactData.type)
+                if (self.props.extraData.ContactData.type == "Project") {
+                    setTimeout(function () {
+                        console.log(1)
+                        ChatService.getChatRoomMembers(self.props.extraData.ContactData.chatroomUid).then(function (memData) {
+                            console.log(self.props.extraData.ContactData.chatroomUid)
+                            self.setState(self.state.members = [])
+                            for (let index in memData) {
+                                self.state.members.push({ value: memData[index], label: memData[index] })
+                            }
+                            console.log("!!!!!!!!!!!!!")
+                            console.log(memData)
+                            self.state.memberNames = memData;
+                            self.setState(self.state)
+                            for (let index in messages) {
+                                self.addMsgToRoom(messages[index]);
+                            }
+                            self.setState({ hasLoadHistoryMsg: true })
+                        })
+                    }, 1000);
+
                 }
+                return messages
 
             })
-            .then(() => {
+            .then((messages) => {
                 ChatService.listenChatRoomChange(this.props.extraData.ContactData.chatroomUid).on('child_added', function (data) {
-                    console.log('Listen msg changing:');
+                    console.log('!!!!!!!!!!!!!!!!Listen msg changing:');
                     console.log(data.val());
                     // console.log(data.val().senderUid);
                     // console.log(data.key);
-
-                    if (self.state.messages.length == 0 &&
+                    console.log(isInit)
+                    //For the first condition, sender and receiver will call onchange twice, so need to prevent it
+                    console.log(self.state.messages.length)
+                    if ((isInit == false || (messages == null || messages.length == 0)) &&
                         UserService.getCurrentUser().uid != data.val().senderUid) {
+                        console.log('!!!!!!!!!!!!!!!!Listen msg changing:11111');
                         self.addMsgToRoom(data.val())
                         ChatService.updateHistory(self.props.extraData.ContactData.chatroomUid, data.val().content)
                     } else if (isInit == false && UserService.getCurrentUser().uid != data.val().senderUid) {
+                        console.log('!!!!!!!!!!!!!!!!Listen msg changing:222222');
                         self.addMsgToRoom(data.val())
                         ChatService.updateHistory(self.props.extraData.ContactData.chatroomUid, data.val().content)
                     }
                     if (isInit) {
                         isInit = false;
+                        console.log("Has Init!!!!!!!!!!!!!!");
                     }
 
                     //console.log(data.val());
@@ -133,7 +156,7 @@ class ChatRoom extends React.Component {
         let msg = msgData.content
         if (ChatService.checkSenderIsCurrentUser(msgData.senderUid) == false &&
             this.props.extraData.ContactData.type == "Project") {
-            msg = msgData.senderName + ":" + msgData.content
+            msg = this.state.memberNames[msgData.senderUid] + ":" + msgData.content
             recipient = msgData.senderUid
         } else if (ChatService.checkSenderIsCurrentUser(msgData.senderUid) == false) {
             recipient = msgData.senderUid;
@@ -146,16 +169,15 @@ class ChatRoom extends React.Component {
         //     //msg = msgData.senderName+":"+ msgData.content
         // }
 
-        
-        console.log(msgData.senderUid)
+
         prevState.messages.push(new Message({ id: recipient, message: msg }));
         this.setState(this.state)
 
-        
+
         //Scroll to buttom
         let room = this.refs.roomView;
-        if(room != undefined){
-             room.scrollTop = room.scrollHeight;
+        if (room != undefined) {
+            room.scrollTop = room.scrollHeight;
         }
     }
 
@@ -191,10 +213,6 @@ class ChatRoom extends React.Component {
     }
 
     render() {
-        //this.componentDidMount()
-        console.log('1!!!!!!!!!!!!')
-        console.log(this.props.extraData.fromLeftHistory)
-        console.log(this.props.extraData.fromLeftHistory == undefined)
         if (this.props.extraData.fromLeftHistory != undefined &&
             this.props.extraData.fromLeftHistory == true) {
             this.props.extraData.fromLeftHistory = false
@@ -206,7 +224,6 @@ class ChatRoom extends React.Component {
             console.log('INNN')
         }
         return (
-            console.log('return render !!!!!'),
             <div>
                 <div>
                     <Row>
@@ -220,45 +237,45 @@ class ChatRoom extends React.Component {
                         </Col>
                     </Row>
                 </div>
-            <div className='chatContainer'>
+                <div className='chatContainer'>
 
 
-                <div id="ChatMian" ref='roomView'>
-                    <ChatFeed
-                        style={{display: 'flex'}}
-                        messages={this.state.messages} // Boolean: list of message objects
-                        isTyping={this.state.is_typing} // Boolean: is the recipient typing
-                        hasInputField={false} // Boolean: use our input, or use your own
-                        bubblesCentered={false} //Boolean should the bubbles be centered in the feed?
-                        // JSON: Custom bubble styles
-                        bubbleStyles={
-                            {
-                                text: {
-                                    fontSize: 15,
-                                    color: 'black'
-                                },
-                                chatbubble: {
-                                    borderRadius: 5,
-                                    padding: 10,
-                                    
+                    <div id="ChatMian" ref='roomView'>
+                        <ChatFeed
+                            style={{ display: 'flex' }}
+                            messages={this.state.messages} // Boolean: list of message objects
+                            isTyping={this.state.is_typing} // Boolean: is the recipient typing
+                            hasInputField={false} // Boolean: use our input, or use your own
+                            bubblesCentered={false} //Boolean should the bubbles be centered in the feed?
+                            // JSON: Custom bubble styles
+                            bubbleStyles={
+                                {
+                                    text: {
+                                        fontSize: 15,
+                                        color: 'black'
+                                    },
+                                    chatbubble: {
+                                        borderRadius: 5,
+                                        padding: 10,
 
-                                },
-                                userBubble: {
-                                    backgroundColor: '#8FC1D4',
+
+                                    },
+                                    userBubble: {
+                                        backgroundColor: '#8FC1D4',
+                                    }
+
                                 }
-
                             }
-                        }
-                    />
-                    
-                </div>
-                <div id="ChatInput">
-                    <form id="typeMessage" onSubmit={this._onMessageSubmit.bind(this)}>
-                        <input type="chatInput" ref="message" placeholder="Type a message..." className="message-input" />
-                    </form>
+                        />
+
+                    </div>
+                    <div id="ChatInput">
+                        <form id="typeMessage" onSubmit={this._onMessageSubmit.bind(this)}>
+                            <input type="chatInput" ref="message" placeholder="Type a message..." className="message-input" />
+                        </form>
+                    </div>
                 </div>
             </div>
-</div>
         )
     }
 
