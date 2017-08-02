@@ -420,13 +420,19 @@ class ProjectManagement extends React.Component {
 
         var target_cards = [];
         console.log("removing1")
-        if (this.state.lanes != undefined) {
-            for (let i = 0; i < this.state.lanes[tcard_lane].cards.length; i++) {
-                target_cards[i] = this.state.lanes[tcard_lane].cards[i];
-                console.log("my card")
-                console.log(target_cards[i]);
-            }
-        }
+        console.log(tcard_lane)
+        console.log(this.state.lanes)
+        console.log(mydata)
+        //this.state.lanes = mydata;
+        console.log(this.state.lanes)
+        this.state.lanes = mydata.lanes
+        // if (this.state.lanes[tcard_lane] != undefined) {
+        //     for (let i = 0; i < this.state.lanes[tcard_lane].cards.length; i++) {
+        //         target_cards[i] = this.state.lanes[tcard_lane].cards[i];
+        //         console.log("my card")
+        //         console.log(target_cards[i]);
+        //     }
+        // }
         // console.log(target_cards[0])
         // var index = target_cards.findIndex(x => x.id == cardId);
         // console.log(target_cards)
@@ -439,8 +445,8 @@ class ProjectManagement extends React.Component {
 
         console.log("removing")
         console.log(this.state.lanes)
-        this.state.lanes[scard_lane].cards = source_cards;
-        this.state.lanes[tcard_lane].cards = target_cards;
+        //this.state.lanes[scard_lane].cards = source_cards;
+        //this.state.lanes[tcard_lane].cards = target_cards;
         console.log('drag ended')
         console.log(`cardId: ${cardId}`)
         console.log(`sourceLaneId: ${sourceLaneId}`)
@@ -513,7 +519,8 @@ class ProjectManagement extends React.Component {
         }
         else {
             //this.state.projectList[0]
-            this.displayedCards(undefined)
+            this.displayedCards(this.state.projectList[0])
+            alert("Please Click Project Name before changing cards");
         }
 
         /*
@@ -602,107 +609,139 @@ class ProjectManagement extends React.Component {
     }
 
     handleSaveModal(isNew, laneId, id, title, description) {
-        if (isNew) {
-            var newId = Tools.guid();
-            addCard(laneId, newId, title, description, this.state.curProject);
-        }
-        else {
-            let myFirstPromise = new Promise((resolve, reject) => {
-                // We call resolve(...) when what we were doing made async successful, and reject(...) when it failed.
-                // In this example, we use setTimeout(...) to simulate async code. 
-                // In reality, you will probably be using something like XHR or an HTML5 API.
-                var dcard_lane;
-                switch (laneId) {
-                    case "Backlog":
-                        dcard_lane = 0;
-                        break;
-                    case "Next":
-                        dcard_lane = 1;
-                        break;
-                    case "InProgress":
-                        dcard_lane = 2;
-                        break;
-                    case "Staged":
-                        dcard_lane = 3;
-                        break;
-                    case "QA":
-                        dcard_lane = 4;
-                        break;
-                    case "Live":
-                        dcard_lane = 5;
-                        break;
-                    default:
-                        dcard_lane = 0;
+        try {
+            if (isNew) {
+                var newId = Tools.guid();
+                addCard(laneId, newId, title, description, this.state.curProject);
+                this.state.isNew = false;
+            }
+            else {
+                let myFirstPromise = new Promise((resolve, reject) => {
+                    // We call resolve(...) when what we were doing made async successful, and reject(...) when it failed.
+                    // In this example, we use setTimeout(...) to simulate async code. 
+                    // In reality, you will probably be using something like XHR or an HTML5 API.
+                    var dcard_lane;
+                    switch (laneId) {
+                        case "Backlog":
+                            dcard_lane = 0;
+                            break;
+                        case "Next":
+                            dcard_lane = 1;
+                            break;
+                        case "InProgress":
+                            dcard_lane = 2;
+                            break;
+                        case "Staged":
+                            dcard_lane = 3;
+                            break;
+                        case "QA":
+                            dcard_lane = 4;
+                            break;
+                        case "Live":
+                            dcard_lane = 5;
+                            break;
+                        default:
+                            dcard_lane = 0;
+                    }
+                    try{
+                        mydata.lanes[dcard_lane].cards.push({ description: description, id: id, title: title });
+                    
+                    //this.state.lanes[dcard_lane].cards.push({ description: description, id: id, title: title, label: "" });
+                    this.state.lanes = mydata.lanes;
+                    console.log("Here is project List");
+                    var index = this.state.projectList.findIndex(x => x.key == this.state.curProject);
+                    //console.log(this.state.projectList.findIndex(x => x.key == this.state.curProject));
+                    //this.state.projectList[index].data.lanes[card_lane].cards.push({ description: description, id: newId, title: title });
+                    //console.log(this.state.projectList[index].data.lanes[dcard_lane].cards);
+
+                    var cards = mydata.lanes[dcard_lane].cards;
+                    var newcard = {};
+
+                    console.log(cards[0])
+                    let ind = cards.findIndex(x => x.id == id);
+                    console.log(cards)
+                    if (ind > -1) {
+                        newcard = cards[ind];
+                        cards.splice(ind, 1);
+                    }
+                    this.state.projectList[index].data.lanes[dcard_lane].cards = cards;
+                    deleteCard(laneId, id, title, description, this.state.curProject);
+                    
+
+                    setTimeout(function () {
+                        resolve("Success!"); // Yay! Everything went well!
+                    }, 100);
+                    }
+                    catch(exp) {
+                        alert(exp);
+                        reject("failure");
+                    }
+                });
+
+
+                myFirstPromise.then(() => {
+                    // successMessage is whatever we passed in the resolve(...) function above.
+                    // It doesn't have to be a string, but if it is only a succeed message, it probably will be.
+                    console.log("adding after delete! ");
+                    addCard(laneId, id, title, description, this.state.curProject);
+                });
+
+                //deleteCard(laneId, id, title, description);
+                //addCard(laneId, id, title, description);
+            }
+            var card_lane;
+            switch (laneId) {
+                case "Backlog":
+                    card_lane = 0;
+                    break;
+                case "Next":
+                    card_lane = 1;
+                    break;
+                case "InProgress":
+                    card_lane = 2;
+                    break;
+                case "Staged":
+                    card_lane = 3;
+                    break;
+                case "QA":
+                    card_lane = 4;
+                    break;
+                case "Live":
+                    card_lane = 5;
+                    break;
+                default:
+                    card_lane = 0;
+            }
+            console.log(this.state.lanes)
+            this.state.lanes = mydata.lanes;
+            console.log(this.state.lanes)
+
+            if (this.state.lanes[card_lane] == undefined)
+                this.state.lanes[card_lane].cards = [];
+            //mydata.lanes[card_lane].cards.push({ description: description, id: newId, label: title });   <------------
+            //this.state.lanes[card_lane].cards.push({ description: description, id: newId, title: title });
+            console.log("Here is project List");
+            console.log(this.state.projectList)
+            var index = this.state.projectList.findIndex(x => x.key == this.state.curProject);
+            console.log(this.state.projectList.findIndex(x => x.key == this.state.curProject))
+
+
+            if (index > -1) {
+                if (this.state.projectList[index].data == undefined) {
+                    this.state.projectList[index].data = mydata;
                 }
-                mydata.lanes[dcard_lane].cards.push({ description: description, id: id, title: title });
-                this.state.lanes[dcard_lane].cards.push({ description: description, id: id, title: title, label: "" });
-                console.log("Here is project List");
-                var index = this.state.projectList.findIndex(x => x.key == this.state.curProject);
-                console.log(this.state.projectList.findIndex(x => x.key == this.state.curProject))
-                //this.state.projectList[index].data.lanes[card_lane].cards.push({ description: description, id: newId, title: title });
-                console.log(this.state.projectList[index].data.lanes[dcard_lane].cards);
-
-                var cards = this.state.projectList[index].data.lanes[dcard_lane].cards;
-                var newcard = {};
-
-                console.log(cards[0])
-                let ind = cards.findIndex(x => x.id == id);
-                console.log(cards)
-                if (ind > -1) {
-                    newcard = cards[ind];
-                    cards.splice(ind, 1);
-                }
-                this.state.projectList[index].data.lanes[dcard_lane].cards = cards;
-                deleteCard(laneId, id, title, description, this.state.curProject);
-            });
-
-            myFirstPromise.then(() => {
-                // successMessage is whatever we passed in the resolve(...) function above.
-                // It doesn't have to be a string, but if it is only a succeed message, it probably will be.
-                //console.log("Yay! ");
-                addCard(laneId, id, title, description, this.state.curProject);
-            });
-
-            //deleteCard(laneId, id, title, description);
-            //addCard(laneId, id, title, description);
+                console.log(this.state.projectList[index].data.lanes[card_lane]);
+                this.state.projectList[index].data = mydata;
+                if (this.state.projectList[index].data.lanes[card_lane].cards == undefined)
+                    this.state.projectList[index].data.lanes[card_lane].cards = [];
+                this.state.projectList[index].data = mydata
+                //lanes[card_lane].cards.push({ description: description, id: newId, label: title });
+                console.log(this.state.projectList[index].data.lanes[card_lane].cards);
+            }
         }
-        var card_lane;
-        switch (laneId) {
-            case "Backlog":
-                card_lane = 0;
-                break;
-            case "Next":
-                card_lane = 1;
-                break;
-            case "InProgress":
-                card_lane = 2;
-                break;
-            case "Staged":
-                card_lane = 3;
-                break;
-            case "QA":
-                card_lane = 4;
-                break;
-            case "Live":
-                card_lane = 5;
-                break;
-            default:
-                card_lane = 0;
+        catch (exp) {
+            alert(exp);
         }
-        mydata.lanes[card_lane].cards.push({ description: description, id: newId, label: title });
-        this.state.lanes[card_lane].cards.push({ description: description, id: newId, title: title});
-        console.log("Here is project List");
-        console.log(this.state.projectList)
-        var index = this.state.projectList.findIndex(x => x.key == this.state.curProject);
-        console.log(this.state.projectList.findIndex(x => x.key == this.state.curProject))
-        if(this.state.projectList[index].data == undefined) {
-            this.state.projectList[index].data = mydata;
-        }
-        if (index > -1) {
-            this.state.projectList[index].data.lanes[card_lane].cards.push({ description: description, id: newId, title: title });
-            console.log(this.state.projectList[index].data.lanes[card_lane].cards);
-        }
-
 
 
         this.setState({ showModal: false });

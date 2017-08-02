@@ -90,11 +90,13 @@ class ProjectSummary extends React.Component {
             var series = [];
             if (item.data != undefined) {
                 for (var i = 0; i < item.data.lanes.length; i++) {
-                    if (item.data.lanes[i].cards != undefined) {
-                        series.push(item.data.lanes[i].cards.length);
-                    }
-                    else {
-                        series.push(0);
+                    if (item.data.lanes[i] != undefined) {
+                        if (item.data.lanes[i].cards != undefined) {
+                            series.push(item.data.lanes[i].cards.length);
+                        }
+                        else {
+                            series.push(0);
+                        }
                     }
                 }
             }
@@ -106,7 +108,7 @@ class ProjectSummary extends React.Component {
         };
         var type = 'Pie';
         var style = {
-            height:300,
+            height: 300,
             width: 300
         }
         return (
