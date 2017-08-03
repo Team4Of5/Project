@@ -153,7 +153,6 @@ class AdminSettings extends React.Component {
             Users.updateRole(this.state.value.email, this.state.curUserCompany, this.state.newRole)
                 .then((Users) => {
                     //handle redirect
-                    alert("User " + this.state.value.email + " has been changed to role " + this.state.newRole)
                     this.setState({ redirectToMenu: true });
                      })
                     .then((Users) => {

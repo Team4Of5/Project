@@ -70,25 +70,25 @@ export const saveUserinfo = function () {
 export const updateRole = function (email, company, new_role) {
     var user = getCurrentUser();
     var user_email = user.email;
-    return usersRef.once("value", function (snap) {
-        const keys = Object.keys(snap.val());
-        for (let i = 0; i < keys.length; i++) {
-            const k = keys[i];
-            const uid = k
-            var thisUserRef = usersRef.child(k)
-            thisUserRef.once("value", function (snap2) {
-                if (snap2.val().email == email) {
-                    if (snap2.val().company != company) {
-                        alert("You cannot edit someone outside of your company")
-                    } else if (snap2.val().role == "Sysadmin") {
-                        alert("You cannot edit Sysadmin privileges")
-                    }
-                    else {
-                        alert("User " + this.state.value.email + " has been changed to role " + this.state.newRole)
-                        usersRef.child(k).update({
-                            role: new_role
-                        });
-                    }
+    return usersRef.once("value", function(snap) {
+      const keys = Object.keys(snap.val());
+      for (let i = 0; i < keys.length; i++) {
+        const k = keys[i];
+        const uid = k
+        var thisUserRef =  usersRef.child(k)
+        thisUserRef.once("value", function(snap2){
+        if (snap2.val().email == email){
+            if (snap2.val().company != company){
+                alert("You cannot edit someone outside of your company")
+            } else if (snap2.val().role=="Sysadmin"){
+                alert("You cannot edit Sysadmin privileges")
+            }
+            else {
+            alert("User " + email + " has been changed to role " + new_role)
+            usersRef.child(k).update({
+                role: new_role
+            });
+        }
 
                 }
 
