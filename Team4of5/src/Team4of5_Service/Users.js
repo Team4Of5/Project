@@ -66,7 +66,7 @@ export const updateRole = function (email, company, new_role) {
                 alert("You cannot edit Sysadmin privileges")
             }
             else {
-            alert("User " + this.state.value.email + " has been changed to role " + this.state.newRole)
+            alert("User " + email + " has been changed to role " + new_role)
             usersRef.child(k).update({
                 role: new_role
             });
