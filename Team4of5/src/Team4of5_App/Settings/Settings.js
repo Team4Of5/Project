@@ -51,7 +51,7 @@ class Settings extends React.Component {
 
     componentDidMount() {
 
-        var user = firebase.auth().currentUser;
+        var user = Users.getCurrentUser();
         var name,
             email,
             photoUrl,

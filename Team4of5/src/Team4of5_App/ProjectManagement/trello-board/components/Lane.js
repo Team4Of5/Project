@@ -16,6 +16,11 @@ const CARD_MARGIN = 10
 const OFFSET_HEIGHT = 15
 
 class Lane extends Component {
+
+  constructor(props) {
+    super(props);
+    this.myfunc = this.myfunc.bind(this);
+  }
   state = {
     loading: false,
     currentPage: this.props.currentPage,
@@ -86,6 +91,11 @@ class Lane extends Component {
     return !this.sameCards(this.props.cards, nextProps.cards) || nextState !== this.state
   }
 
+  myfunc(idx, newId) {
+    console.log(this);
+    this.state.cards;
+  }
+
   renderDragContainer = () => {
     const { connectDropTarget, laneSortFunction, onCardClick, id } = this.props
 
@@ -103,6 +113,7 @@ class Lane extends Component {
         cardStyle={this.props.cardStyle}
         moveCard={this.moveCard}
         removeCard={this.removeCard}
+        myfunc = {this.myfunc}
         onClick={() => onCardClick && onCardClick(card, this.props.id)}
         {...card}
       />
@@ -150,9 +161,16 @@ Lane.propTypes = {
 
 const cardTarget = {
   drop (props, monitor, component) {
+    console.log("Lane.js")
+    console.log(monitor)
+    console.log(props)
+    console.log(component)
     const { id } = props
     const index = component.state.placeholderIndex
     const draggedObj = monitor.getItem()
+    var dummy = draggedObj.card;
+    console.log(dummy);
+    //dummy.listId = id;
     if (id !== draggedObj.listId) {
       props.actions.addCard({
         laneId: id,

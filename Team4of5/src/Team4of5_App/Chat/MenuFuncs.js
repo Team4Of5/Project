@@ -47,8 +47,7 @@ class MenuFuncs extends React.Component {
 
     componentDidMount() {
         let self = this;
-        console.log("User.userExist: " + User.userExist());
-        if (User.userExist() == true) {
+       
             User.getUserData().then(function (data) {
                 self.getData(data);
             }, function (err) {
@@ -56,7 +55,6 @@ class MenuFuncs extends React.Component {
                 console.log("Promise Error");
                 console.log(err);
             })
-        }
 
         ChatService.getUserStatus().then(function (data) {
             if (data.val() == null) {
@@ -104,6 +102,7 @@ class MenuFuncs extends React.Component {
                         <div >
                             <h4>{this.state.userInfo[0]}</h4>
                             <Select
+                                className="statusDropdown"
                                 style={{ width: 150 }}
                                 autosize
                                 ref="stateSelect"

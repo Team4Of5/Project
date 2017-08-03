@@ -7,6 +7,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 //load the firebase
 import * as firebase from 'firebase';
 import * as Config from '../../Team4of5_Service/Config.js';
+import * as userService from '../../Team4of5_Service/Users.js';
 
 import {
   BrowserRouter as Router,
@@ -31,7 +32,7 @@ class NavbarHeaderC extends React.Component {
   }
   componentDidMount() {
 
-    var user = firebase.auth().currentUser;
+    var user = userService.getCurrentUser();
     var name, email, photoUrl, uid, emailVerified;
 
     if (user != null) {
@@ -47,7 +48,7 @@ class NavbarHeaderC extends React.Component {
   gotData = (data) => {
     let newUser = []
     const userdata = data.val();
-    firebase.auth().currentUser.updateProfile({
+    userService.getCurrentUser().updateProfile({
       displayName: userdata.display_name
     }).then(function () {
       // Update successful.
@@ -105,7 +106,9 @@ class NavbarHeaderC extends React.Component {
 
 
               <LinkContainer  to='/login'>
-              <MenuItem  eventKey={5.2}>Logout</MenuItem>
+              <MenuItem  eventKey={5.2} onClick={()=>{
+                userService.logoutUser();
+              }}>Logout</MenuItem>
           </LinkContainer>
 
             </NavDropdown>

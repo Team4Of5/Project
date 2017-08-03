@@ -41,7 +41,7 @@ class NewIssue extends React.Component {
             redirectToIssue: false,
 
         };
-
+    //binding the states
         this.handleChange = this.handleChange.bind(this);
         this.getUsers = this.getUsers.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -49,9 +49,8 @@ class NewIssue extends React.Component {
         this.handleProjectChange = this.handleProjectChange.bind(this);
         this.getProjectID = this.getProjectID.bind(this);
 
-        //connect with firebase
     }
-
+//connect the database
     componentDidMount() {
         //
         let self = this;
@@ -68,6 +67,7 @@ class NewIssue extends React.Component {
         items[name] = event.target.value;
         this.setState(items);
     }
+    // for user email auto completion
     handleOwnerChange(value) {
         console.log("change happening")
         console.log(value)
@@ -75,6 +75,7 @@ class NewIssue extends React.Component {
             value: value,
         });
     }
+    //for project auto completion
     handleProjectChange(project) {
         console.log("change happening")
         console.log(project)
@@ -82,6 +83,7 @@ class NewIssue extends React.Component {
             project: project,
         });
     }
+    //handle data back to firebase
     handleSubmit(event) {
         event.preventDefault();
 

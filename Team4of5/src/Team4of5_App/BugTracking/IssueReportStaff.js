@@ -10,6 +10,7 @@ import * as User from '../../Team4of5_Service/Users.js';
 class IssueReportStaff extends Component {
      constructor(props){
           super(props);
+          //set state
      this.state = {
       reportIssue: [],
           data: [],
@@ -18,12 +19,13 @@ class IssueReportStaff extends Component {
           chatProjArray: [],
      errorInput:''
      };
+     //bind the props
       this.staffIssueForm = this.staffIssueForm.bind(this);
       this.appendColumn = this.appendColumn.bind(this);
       this.getData = this.getData.bind(this);
       this.gotData = this.gotData.bind(this);
 }
-
+// Component bind the firebase
  componentDidMount() {
           let self = this;
 
@@ -41,7 +43,8 @@ class IssueReportStaff extends Component {
               }
           );
 }
-    
+
+//get the project data from firebase
     getData(data) {
        let self = this;
         const projdata = data.val();
@@ -64,7 +67,7 @@ class IssueReportStaff extends Component {
           if (user_in_proj == true){
               projArray.push({name: projname});
           }
-            
+
         }
 
         this.setState({chatProjArray: projArray});
@@ -82,10 +85,7 @@ class IssueReportStaff extends Component {
 
       }
 
-
-
-    
-
+//get the issue data from firebase
     gotData(data) {
         const issuedata = data.val();
         const keys = Object.keys(issuedata);
@@ -266,7 +266,7 @@ class IssueReportStaff extends Component {
 
     }
 
-
+//Issue relative with Staff report
      staffIssueForm(id,value){
           console.log(this.props,'issues reports with staff');
             let newArray = this.state.data.slice();
@@ -309,7 +309,7 @@ class IssueReportStaff extends Component {
 
 
      render(){
-
+    //create the report tables
           let list = this.state.data.map(p =>{
                return (
 
@@ -335,7 +335,7 @@ class IssueReportStaff extends Component {
 
                );
           });
-
+//create the JSX
           return (
               <div id="issueUpdateBody">
               <div className="panel panel-primary">

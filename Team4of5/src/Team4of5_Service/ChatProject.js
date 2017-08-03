@@ -62,10 +62,16 @@ export const addNewCard = function (laneID, id, title, description, project) {
         var lanes = [];
         var cards = [];
         const keys = Object.keys(projdata);
-        projArray.push(projdata[keys[0]].data.lanes);
-        lanes = projArray[0];
-        if (lanes[card_lane].cards != undefined) {
-            cards = lanes[card_lane].cards;
+        var indexOfProject = keys.indexOf(project);
+        if (projdata[keys[indexOfProject]].data != undefined) {
+            projArray.push(projdata[keys[indexOfProject]].data.lanes);
+            lanes = projArray[0];
+
+            if (lanes[card_lane] != undefined) {
+                if (lanes[card_lane].cards != undefined) {
+                    cards = lanes[card_lane].cards;
+                }
+            }
         }
         cards.push({ id: id, title: title, description: description });
         //chatProject.push(lanes);
@@ -76,7 +82,10 @@ export const addNewCard = function (laneID, id, title, description, project) {
 
         //f (user_display_name && user_role) {
         return thisRef.update({
-            cards: cards
+            cards: cards,
+            id: laneID,
+            label: '0/0',
+            title: laneID
         });
         //}
 
@@ -122,14 +131,17 @@ export const removeCard = function (laneID, id, project) {
         var lanes = [];
         var cards = [];
         const keys = Object.keys(projdata);
-        projArray.push(projdata[keys[0]].data.lanes);
+        var indexOfProject = keys.indexOf(project);
+        projArray.push(projdata[keys[indexOfProject]].data.lanes);
         lanes = projArray[0];
         //cards = lanes[card_lane].cards;
         //cards.push({ id: id, title: title, description: description });
 
 
-        for (let i = 0; i < lanes[card_lane].cards.length; i++) {
-            cards[i] = lanes[card_lane].cards[i];
+        if (lanes[card_lane].cards != undefined) {
+            for (let i = 0; i < lanes[card_lane].cards.length; i++) {
+                cards[i] = lanes[card_lane].cards[i];
+            }
         }
 
         //var array = [2, 5, 9];
@@ -198,15 +210,22 @@ export const updateCard = function (id, laneID, targetLaneId, project) {
         var lanes = [];
         var cards = [];
         const keys = Object.keys(projdata);
-        projArray.push(projdata[keys[0]].data.lanes);
-        lanes = projArray[0];
-        //cards = lanes[card_lane].cards;
-        //cards.push({ id: id, title: title, description: description });
+        var indexOfProject = keys.indexOf(project);
+        if (projdata[keys[indexOfProject]] != undefined) {
+            projArray.push(projdata[keys[indexOfProject]].data.lanes);
+            lanes = projArray[0];
+            //cards = lanes[card_lane].cards;
+            //cards.push({ id: id, title: title, description: description });
 
-
-        for (let i = 0; i < lanes[card_lane].cards.length; i++) {
-            cards[i] = lanes[card_lane].cards[i];
+            if (lanes[card_lane] != undefined) {
+                if (lanes[card_lane].cards != undefined) {
+                    for (let i = 0; i < lanes[card_lane].cards.length; i++) {
+                        cards[i] = lanes[card_lane].cards[i];
+                    }
+                }
+            }
         }
+
 
         //var array = [2, 5, 9];
         //var index = cards.indexOf({id:id});

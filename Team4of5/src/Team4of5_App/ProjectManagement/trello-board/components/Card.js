@@ -64,8 +64,14 @@ const cardSource = {
   endDrag (props, monitor) {
     const item = monitor.getItem()
     const dropResult = monitor.getDropResult()
+    console.log("Card.js")
+    console.log(monitor)
+    console.log(dropResult.listId)
+    console.log(item.listId)
     if (dropResult && dropResult.listId !== item.listId) {
+      console.log("I AM REMOVING")
       props.removeCard(item.listId, item.id)
+      props.myfunc(props.index,dropResult.listId)
     }
     props.handleDragEnd(item.id, item.listId, dropResult ? dropResult.listId : item.listId)
   }
@@ -106,7 +112,6 @@ const cardTarget = {
     if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
       return
     }
-
     if (props.listId === sourceListId) {
       props.moveCard(dragIndex, hoverIndex)
       monitor.getItem().index = hoverIndex

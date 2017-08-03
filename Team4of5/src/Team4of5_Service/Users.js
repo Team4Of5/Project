@@ -3,7 +3,6 @@
 import * as firebase from 'firebase';
 import * as Config from './Config.js';
 
-
 firebase.initializeApp(Config.firebase_config);
 var ref = firebase.app().database().ref();
 var usersRef = ref.child('users');
@@ -11,6 +10,14 @@ var issueRef = ref.child('issues');
 
 const issueStatus = ['New', 'Open', 'Assiged', 'Fixed', 'Verified', 'Closed'];
 
+firebase.auth().onAuthStateChanged(function (user) {
+    if (user) {
+        localStorage.setItem("currentUser", JSON.stringify(user))
+    } else {
+        localStorage.clear();
+    }
+
+});
 
 export const create_user = function (user_email, user_pass) {
     return firebase.auth().createUserWithEmailAndPassword(user_email, user_pass);
@@ -33,16 +40,27 @@ export const saveUserinfo = function () {
                 last_login_dtm: Date.now(),
                 email: user_email
             });
+
             thisUserRef.on("value", function (snapshot) {
                 var role = snapshot.val().role;
                 var company = snapshot.val().company
                 if (role == null) {
-                            thisUserRef.update({
-                                role: 'Customer'
-                });
+                    thisUserRef.update({
+                        role: 'Customer'
+                    });
+                }
+                let displayName = snapshot.val().display_name;
+                if (displayName == null) {
+                    let tempUserDName = user_email.split("@")[0];
+                    user.updateProfile({
+                        displayName: tempUserDName
+                    }).then(() => {
+                        thisUserRef.update({
+                            display_name: tempUserDName
+                        });
+                        updateContactUserName();
+                    })
 
-
-                            
                 }
             });
         }
@@ -50,7 +68,7 @@ export const saveUserinfo = function () {
 }
 
 export const updateRole = function (email, company, new_role) {
-    var user = firebase.auth().currentUser;
+    var user = getCurrentUser();
     var user_email = user.email;
     return usersRef.once("value", function(snap) {
       const keys = Object.keys(snap.val());
@@ -72,34 +90,34 @@ export const updateRole = function (email, company, new_role) {
             });
         }
 
+                }
+
+            });
+
         }
-
-        });
-
-      }
     });
 
 }
 
 export const updateCompany = function (email, user_company) {
-    return usersRef.once("value", function(snap) {
-      const keys = Object.keys(snap.val());
-      for (let i = 0; i < keys.length; i++) {
-        const k = keys[i];
-        const uid = k
-        var thisUserRef =  usersRef.child(k)
-        thisUserRef.once("value", function(snap2){
-        if (snap2.val().email == email){
+    return usersRef.once("value", function (snap) {
+        const keys = Object.keys(snap.val());
+        for (let i = 0; i < keys.length; i++) {
+            const k = keys[i];
+            const uid = k
+            var thisUserRef = usersRef.child(k)
+            thisUserRef.once("value", function (snap2) {
+                if (snap2.val().email == email) {
 
-            usersRef.child(k).update({
-                company: user_company
+                    usersRef.child(k).update({
+                        company: user_company
+                    });
+                }
+
+
             });
+
         }
-
-
-        });
-
-      }
     });
 
 }
@@ -125,7 +143,7 @@ export const resetPwdWhenLoggedOn = function () {
 
 // this allows a user to update their display name in the settings tab
 export const updateSettings = function (user_display_name, user_role) {
-    var user = firebase.auth().currentUser;
+    var user = getCurrentUser()
     var user_uid = user.uid;
     var thisUserRef = usersRef.child(user_uid);
 
@@ -142,6 +160,7 @@ export const updateSettings = function (user_display_name, user_role) {
             displayName: user_display_name
         }).then(function () {
             // Update successful.
+            updateContactUserName();
         }, function (error) {
             // An error happened.
         });
@@ -161,31 +180,31 @@ export const updateSettings = function (user_display_name, user_role) {
 // this allows a user to logout
 // it shouldn't need any parameters if the user is logged in
 export const logoutUser = function () {
-    firebase.database().ref("presence/" + firebase.auth().currentUser.uid).set(false);
+    firebase.database().ref("presence/" + getCurrentUser().uid).set(false);
+    localStorage.clear();
     return firebase.auth().signOut();
 }
 
-export const userExist = function () {
-    if (firebase.auth().currentUser != null) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-export const getCurUserCompany = function(){
-    return usersRef.child(firebase.auth().currentUser.uid).child('company').once('value')
+export const getCurUserCompany = function () {
+    return usersRef.child(getCurrentUser().uid).child('company').once('value')
 }
 
 //Must check current user exist before calling this function!!!!!
 export const getUserData = function () {
-    let user = firebase.auth().currentUser;
+    let user = getCurrentUser();
     return firebase.database().ref().child('users/' + user.uid).once('value')
 }
 
 
 export const getCurrentUser = function () {
-    return firebase.auth().currentUser;
+    if (firebase.auth().currentUser != null) {
+        return firebase.auth().currentUser;
+    }
+    else if (JSON.parse(localStorage.getItem("currentUser") != "")) {
+        return JSON.parse(localStorage.getItem("currentUser"))
+    } else {
+        console.log("User loggout!!!")
+    }
 }
 
 export const getAllUserData = function () {
@@ -202,4 +221,16 @@ export const getAllUsersData = function () {
 }
 
 
-
+export const updateContactUserName = function () {
+    let contactRef = ref.child('chatContact');
+    contactRef.child(getCurrentUser().uid).once('value').then((data) => {
+        let contactList = data.val();
+        for (let index in contactList) {
+            if (contactList[index].type != "Project" && index!="status") {
+                contactRef.child(index).child(getCurrentUser().uid).update({
+                    name: getCurrentUser().displayName
+                });
+            }
+        }
+    });
+}

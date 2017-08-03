@@ -12,6 +12,7 @@ import './IssueTracker.css';
 import * as ChatProj from '../../Team4of5_Service/ChatProject.js';
 import * as Users from '../../Team4of5_Service/Users.js';
 
+//create the react-bootstrap-table data type
 const issueData = []
 const issueStatus = [{
   value: 'New',
@@ -129,6 +130,7 @@ componentDidMount() {
   );
 
 }
+//get project data from firebase
     getData(data) {
         const projdata = data.val();
         var projArray = []
@@ -150,7 +152,7 @@ componentDidMount() {
           if (user_in_proj == true){
               projArray.push({name: projname});
           }
-            
+
         }
         this.setState({projdata: projArray});
         this.issueRef.on('value', this.gotData, this.errData);
@@ -158,7 +160,7 @@ componentDidMount() {
 
       }
 
-//get the data from the firebase and push them out
+//get the issue data from the firebase and push them out
  gotData = (data) => {
       let newIssue = []
       const issuedata = data.val();
@@ -205,15 +207,15 @@ componentDidMount() {
       this.setState({issues: newIssue});
     }
 
-
+//handle error
 errData = (err) => {
     console.log(err);
     }
-
+// react-bootstrap-table built in function
 formatType(cell) {
     return `${cell}`;
   }
-
+// handle user click
 handleClick = (rowKey) => {
   alert(this.refs.table.getPageByRowKey(rowKey));
 }

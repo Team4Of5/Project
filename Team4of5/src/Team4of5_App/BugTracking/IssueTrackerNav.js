@@ -6,8 +6,6 @@ import {
     BrowserRouter as Router,
     Route,
     Link,
-    Redirect,
-    Switch,
     NavLink
 } from 'react-router-dom';
 import IssueReports from './IssueReports.js';
@@ -24,6 +22,7 @@ class  IssueTrackerNav extends React.Component {
 render(){
 
 return (
+    // Those are the tabs 
       <div>
         <Nav bsStyle="tabs" >
             <LinkContainer  to='/menu/IssueTracker'>

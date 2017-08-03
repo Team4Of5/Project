@@ -15,29 +15,43 @@ const LaneHelper = {
   },
 
   appendCardsToLane: (state, {laneId, newCards, index}) => {
+    console.log("Appending multiple")
+    console.log(laneId)
+    console.log(index)
+    console.log(state.lanes)
     const lanes = state.lanes.map((lane) => {
+      console.log(lane.id)
       if (lane.id === laneId) {
+        console.log("insidee")
         if (index !== undefined) {
           lane.cards.splice(index, 0, ...newCards)
         } else {
           lane.cards = [...lane.cards, ...newCards]
         }
       }
+      console.log(lane)
       return lane
     })
+    console.log(lanes)
     return lanes
   },
 
   appendCardToLane: (state, {laneId, card, index}) => {
+    console.log("HEEEERREEE")
+    console.log(card.listId)
+    //card.listId = laneId;
     const updatedLanes = LaneHelper.appendCardsToLane(state, {laneId: laneId, newCards: [card], index})
     return {...state, ...updatedLanes}
   },
 
   removeCardFromLane: (state, {laneId, cardId}) => {
+    console.log("result of removing")
+    console.log(state.lanes)
     const lanes = state.lanes.map((lane) => {
       if (lane.id === laneId) {
         lane.cards = lane.cards.filter((card) => card.id !== cardId)
       }
+      console.log(lane)
       return lane
     })
     return {...state, ...lanes}
